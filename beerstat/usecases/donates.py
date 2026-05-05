@@ -20,7 +20,7 @@ class CreateDonate:
 
 
 @dataclass
-class GetBalance():
+class GetBalance:
     repo: DonateRepo
 
     async def execute(self) -> DonateBalanceDTO:
