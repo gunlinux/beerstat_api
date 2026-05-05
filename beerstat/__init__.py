@@ -1,27 +1,9 @@
-from typing import AsyncGenerator
 from contextlib import asynccontextmanager
-from dataclasses import asdict
 
-import aiosqlite
 from aiosqlitepool import SQLiteConnectionPool
-from aiosqlite import Connection
-from fastapi import (
-    Request,
-    Depends,
-    FastAPI,
-    HTTPException,
-)
-from beerstat.domain.exceptions import DomainError
-from beerstat.repo.donates import DonateRepo
-from beerstat.models import Donate, DonateBalance
-from beerstat.repo.exceptions import RepoError
-from beerstat.usecases.donates import CreateDonate, GetBalance
-
-
-async def sqlite_connection() -> aiosqlite.Connection:
-    """A factory for creating new connections."""
-    conn = await aiosqlite.connect("beer.db")
-    return conn
+from fastapi import FastAPI
+from beerstat.api.v1.donates import donates_router
+from beerstat.api.deps import sqlite_connection
 
 
 @asynccontextmanager
@@ -36,47 +18,11 @@ async def lifespan(app: FastAPI):
     await db_pool.close()
 
 
-app = FastAPI(lifespan=lifespan)
+def create_app(lifespan) -> FastAPI:
+    app = FastAPI(lifespan=lifespan)
+    app.include_router(donates_router)
+
+    return app
 
 
-async def get_db_connection(request: Request) -> AsyncGenerator[Connection, None]:
-    """
-    A dependency that provides a connection from the pool.
-    It accesses the pool from the application state.
-    """
-    db_pool = request.app.state.db_pool
-
-    async with db_pool.connection() as conn:
-        yield conn
-
-
-@app.post("/donate", status_code=201)
-async def donate(
-    donate_data: Donate,
-    db_conn: Connection = Depends(get_db_connection),
-) -> Donate:
-    try:
-        result = Donate(
-            **asdict(
-                await CreateDonate(repo=DonateRepo(connection=db_conn)).execute(
-                    donate_data
-                )
-            )
-        )
-    except RepoError:
-        raise HTTPException(status_code=500)
-    return result
-
-
-@app.get("/balance")
-async def get_donations(
-    db_conn: Connection = Depends(get_db_connection),
-) -> DonateBalance:
-    try:
-        return DonateBalance(
-            **asdict(await GetBalance(repo=DonateRepo(connection=db_conn)).execute())
-        )
-    except DomainError:
-        raise HTTPException(status_code=500)
-    except RepoError:
-        raise HTTPException(status_code=500)
+app = create_app(lifespan=lifespan)
