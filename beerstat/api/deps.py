@@ -1,4 +1,3 @@
-from sqlite3 import connect
 from typing import AsyncGenerator
 
 from fastapi import Request
