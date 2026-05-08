@@ -1,12 +1,13 @@
+from sqlite3 import connect
 from typing import AsyncGenerator
 
 from fastapi import Request
 import aiosqlite
 
 
-async def sqlite_connection() -> aiosqlite.Connection:
+async def sqlite_connection(db_uri: str) -> aiosqlite.Connection:
     """A factory for creating new connections."""
-    conn = await aiosqlite.connect("beer.db")
+    conn = await aiosqlite.connect(db_uri)
     return conn
 
 
