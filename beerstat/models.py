@@ -11,3 +11,10 @@ class Donate(BaseModel):
 
 class DonateBalance(BaseModel):
     total: float
+
+
+class Widget(BaseModel):
+    name: str
+    timeout: int
+    showtime: int
+    template: str

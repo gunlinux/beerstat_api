@@ -1,0 +1,50 @@
+from dataclasses import dataclass
+from aiosqlite import Connection
+from beerstat.domain.widget import WidgetDTO
+
+from beerstat.repo.exceptions import RepoError
+
+
+@dataclass
+class WidgetRepo:
+    connection: Connection
+
+    async def add(
+        self, name: str, timeout: int, showtime: int, template: str
+    ) -> WidgetDTO:
+        cursor = await self.connection.execute(
+            """
+            INSERT INTO widgets (name, timeout, showtime, template) values
+            (?, ?, ?, ?)
+            RETURNING *
+        """,
+            (name, timeout, showtime, template),
+        )
+        if result := await cursor.fetchone():
+            await self.connection.commit()
+            return WidgetDTO(
+                id=result[0],
+                name=result[1],
+                timeout=result[2],
+                showtime=result[3],
+                template=result[4],
+            )
+        raise RepoError
+
+    async def get_by_id(self, widget_id: int) -> WidgetDTO:
+        print(type(widget_id), widget_id)
+        cursor = await self.connection.execute(
+            """
+                SELECT id, name, timeout, showtime, template FROM widgets WHERE id = ?
+            """,
+            (widget_id,),
+        )
+        if result := await cursor.fetchone():
+            return WidgetDTO(
+                id=result[0],
+                name=result[1],
+                timeout=result[2],
+                showtime=result[3],
+                template=result[4],
+            )
+        raise RepoError
