@@ -5,6 +5,7 @@ from aiosqlitepool import SQLiteConnectionPool
 from fastapi import FastAPI
 from beerstat.api.v1.donates import donates_router
 from beerstat.api.v1.widgets import widgets_router
+from beerstat.api.v1.widgets_page import widgets_page
 from beerstat.api.deps import sqlite_connection
 from beerstat.settings import Settings
 
@@ -35,7 +36,7 @@ def create_app(lifespan) -> FastAPI:
     app = FastAPI(lifespan=lifespan)
     app.include_router(donates_router)
     app.include_router(widgets_router, prefix="/widget")
-
+    app.include_router(widgets_page)
     return app
 
 

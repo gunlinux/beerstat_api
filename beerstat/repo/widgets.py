@@ -32,7 +32,6 @@ class WidgetRepo:
         raise RepoError
 
     async def get_by_id(self, widget_id: int) -> WidgetDTO:
-        print(type(widget_id), widget_id)
         cursor = await self.connection.execute(
             """
                 SELECT id, name, timeout, showtime, template FROM widgets WHERE id = ?
@@ -48,3 +47,30 @@ class WidgetRepo:
                 template=result[4],
             )
         raise RepoError
+
+    async def get_stat(self) -> tuple[int, int]:
+        cursor = await self.connection.execute(
+            """
+                SELECT sum(showtime), count(id) template FROM widgets
+            """
+        )
+        if result := await cursor.fetchone():
+            return (result[0], result[1])
+        return (0, 0)
+
+    async def get_all(self) -> list[WidgetDTO]:
+        cursor = await self.connection.execute(
+            """
+                SELECT id, name, timeout, showtime, template FROM widgets
+            """
+        )
+        return [
+            WidgetDTO(
+                id=row[0],
+                name=row[1],
+                timeout=row[2],
+                showtime=row[3],
+                template=row[4],
+            )
+            for row in await cursor.fetchall()
+        ]
