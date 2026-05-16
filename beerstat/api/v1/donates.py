@@ -1,13 +1,14 @@
+from dataclasses import asdict
+
 import aiosqlite
 from fastapi import APIRouter, Depends, HTTPException
+
 from beerstat.api.deps import get_db_connection
 from beerstat.domain.exceptions import DomainError
-
 from beerstat.repo.donates import DonateRepo
 from beerstat.models import Donate, DonateBalance
 from beerstat.repo.exceptions import RepoError
 from beerstat.usecases.donates import CreateDonate, GetBalance
-from dataclasses import asdict
 
 
 donates_router = APIRouter()

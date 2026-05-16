@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 import aiosqlite
 from aiosqlitepool import SQLiteConnectionPool
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from beerstat.api.v1.donates import donates_router
 from beerstat.api.v1.widgets import widgets_router
 from beerstat.api.v1.widgets_page import widgets_page
@@ -36,7 +37,8 @@ def create_app(lifespan) -> FastAPI:
     app = FastAPI(lifespan=lifespan)
     app.include_router(donates_router)
     app.include_router(widgets_router, prefix="/widget")
-    app.include_router(widgets_page)
+    app.include_router(widgets_page, prefix="/page")
+    app.mount("/static", StaticFiles(directory="static"), name="static")
     return app
 
 

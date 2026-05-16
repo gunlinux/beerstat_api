@@ -1,21 +1,18 @@
 from dataclasses import asdict
 from typing import Any, Annotated
-import typing
-
 
 import aiosqlite
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fasthx import hx
-from beerstat.api.deps import get_db_connection
 
+from beerstat.api.deps import get_db_connection
 from beerstat.models import Widget
 from beerstat.repo.exceptions import RepoError
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.usecases.widgets import CreateWidget, GetWidget, GetWidgets
 
+
 DependsDBConn = Annotated[aiosqlite.Connection, Depends(get_db_connection)]
-
-
 widgets_router = APIRouter()
 
 
@@ -23,7 +20,7 @@ async def render_widget(
     _: list[dict[str, str]],
     *,
     context: dict[str, Any],
-    request: typing.Any,
+    request: Any,
 ) -> str:
     widget_id = context["widget_id"]
     db_conn = context["db_conn"]
