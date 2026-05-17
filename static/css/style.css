@@ -1,0 +1,72 @@
+body {
+    background: rgba(0,0,0,0);
+    color: #839496;
+    height: 100vh;
+    width: 100vw;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex;
+}
+
+
+.terminalize {
+    --color-primary: #839496;
+    --color-secondary: #001a1d;
+    --color-tertiary: #007800;
+    --color-quaternary: #001900;
+    color: #839496;
+    text-shadow: None !important;
+}
+
+.terminalize table {
+    margin: 10px 0 0 0;
+}
+
+.widget {
+    flex: 1 1;
+    background: #001a1d;
+    padding: 10px;
+    font-size: 24px;
+    line-height: 28px;
+    font-family: "JetBrains Mono", monospace;
+    font-optical-sizing: auto;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 2s;
+    transition-delay: 0s;
+}
+
+.widget--visible {
+    opacity: 1;
+}
+
+.black {
+    color: #073642;
+}
+
+.red {
+    color: #dc322f;
+}
+
+.green {
+    color: #859900;
+}
+
+.yellow {
+    color: #b58900;
+}
+
+.blue {
+    color: #268bd2 !important;
+    --color-primary: #268bd2;
+}
+
+.magenta {
+    color: #d33682;
+    --color-primary: #d33682;
+}
+
+.white {
+    color: #eee8d5;
+}
+
