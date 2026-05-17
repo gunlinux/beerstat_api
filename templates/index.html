@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 
-{% block head %}
+{% block footer %}
 <script>
   document.body.addEventListener('htmx:afterSwap', function(evt) {
-    var sortables = document.body.querySelector(".widget");
-    sortables.style.display = 'block';
+    var widget = document.body.querySelector(".widget");
+    console.log('fire afterSwap on ', widget);
+    widget.classList.add('widget--visible');
       setTimeout(() => {
           console.log('hide content');
-          if (sortables !== null) {
-            sortables.style.display = 'none';
-          }
-        }, 5000); // 3000 milliseconds = 3 seconds
+          widget.classList.remove('widget--visible');
+      }, {{showtime}}); // 3000 milliseconds = 3 seconds
 
   });
-//  htmx.logAll()
-
+  //htmx.logAll()
 </script>
 {% endblock %}
 
 {% block content %}
-  <div hx-swap="posts" hx-get="/widget"
-                       hx-trigger="every {{sleep_time}}s"
+  <div
+    hx-swap="posts" 
+    hx-get="/widget"
+    hx-trigger="every {{sleep_time}}s"
     hx-target=".widget_lists">
   </div>
   <div class="widget_lists"></div>
@@ -28,7 +28,5 @@
   <article class="widget">
     start widget
   </article>
-
-
 {% endblock content %}
 

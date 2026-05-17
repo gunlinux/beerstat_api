@@ -6,8 +6,9 @@
     <title></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="/static/css/reset.css" rel="stylesheet">
+    <link href="/static/css/terminalize.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
     <script
         src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js" 
         integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"   crossorigin="anonymous">
@@ -18,5 +19,9 @@
   <body>
     {% block content %}
     {% endblock content %}
+    <footer>
+      {% block footer %}
+      {% endblock %}
+    </footer>
   </body>
 </html>

@@ -19,10 +19,7 @@ DependsDBConn = Annotated[aiosqlite.Connection, Depends(get_db_connection)]
 
 
 widgets_page = APIRouter()
-
-
 templates = Jinja2Templates("templates")
-
 app_settings = Settings.model_validate({})
 
 
@@ -33,7 +30,10 @@ async def index(request: Request, db_conn: DependsDBConn) -> _TemplateResponse:
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"sleep_time": app_settings.sleep_time * stat.count + stat.timeout},
+        context={
+            "sleep_time": app_settings.showtime * stat.count + stat.timeout,
+            "showtime": app_settings.showtime * 1000,
+        },
     )
 
 
@@ -49,42 +49,6 @@ async def widget_page(
         )
     except RepoError:
         raise HTTPException(status_code=500)
-    print(result.template)
-    dev = {
-        1: """
-    <p>Donaters list</p>
-    <p><span class="blue">indihugo</span>: 30000</p>
-    <p><span class="blue">indihugo</span>: 30000</p>
-    <p><span class="blue">indihugo</span>: 30000</p>
-    <p><span class="blue">indihugo</span>: 30000</p>
-    <table class="simple bordered">
-      <thead>
-        <tr>
-          <th>Country</th>
-          <th>Population</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td ">loki</td>
-          <td >3000</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2"></td>
-        </tr>
-      </tfoot>
-    </table>
-    """,
-        2: """
-        <p class=blue>gunlinux_bot</p>
-        <p>
-пивной баланс - это <span class="magenta"> сумма </span> под стаканом возле моего лица, когда мне донятят кеш сумма растет. если я трачу кеш на пиво или поддержания стримов сумма падает!
-</p>
-    """,
-    }
-    result.template = dev.get(widget_id, "")
 
     return templates.TemplateResponse(
         request=request, name="widget.html", context={"item": result}

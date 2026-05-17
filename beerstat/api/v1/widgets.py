@@ -10,10 +10,12 @@ from beerstat.models import Widget
 from beerstat.repo.exceptions import RepoError
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.usecases.widgets import CreateWidget, GetWidget, GetWidgets
+from beerstat.settings import Settings
 
 
 DependsDBConn = Annotated[aiosqlite.Connection, Depends(get_db_connection)]
 widgets_router = APIRouter()
+app_settings = Settings.model_validate({})
 
 
 async def render_widget(
@@ -36,26 +38,18 @@ async def render_widgets(
 ) -> str:
     db_conn = context["db_conn"]
     widgets = await GetWidgets(repo=WidgetRepo(connection=db_conn)).execute()
-    out = ""
-    """
-    <div hx-swap="posts" hx-get="/widget/1"
-        hx-trigger="load"
-        hx-target=".widget">
-      </div>
-    """
     out = []
     # full_reload = sum(widget.showtime) + sleep*widgets
     # sleep = 30sec
     delay = 0
-    sleep_timeout = 30
+    sleep_timeout = app_settings.showtime
 
     for widget in widgets:
-        # hx-trigger="load delay:15s"
         out.append(f"""
         <div 
             hx-swap="posts"
             hx-get="{request.url_for("widget_get", widget_id=widget.id)}"
-            hx-trigger="load {"" if not delay else f"delay:{delay}"}"
+            hx-trigger="load {"" if not delay else f"delay:{delay}s"}"
             hx-target=".widget"
         >
         </div>""")

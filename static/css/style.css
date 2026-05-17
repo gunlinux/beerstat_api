@@ -1,6 +1,11 @@
 body {
-    background: #001a1d;
+    background: rgba(0,0,0,0);
     color: #839496;
+    height: 100vh;
+    width: 100vw;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex;
 }
 
 
@@ -14,18 +19,25 @@ body {
 }
 
 .terminalize table {
-    margin: 10px 0 0  0;
-
+    margin: 10px 0 0 0;
 }
 
 .widget {
+    flex: 1 1;
+    background: #001a1d;
     padding: 10px;
-    width: 620px;
-    height: 820px;
     font-size: 24px;
     line-height: 28px;
     font-family: "JetBrains Mono", monospace;
     font-optical-sizing: auto;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 2s;
+    transition-delay: 0s;
+}
+
+.widget--visible {
+    opacity: 1;
 }
 
 .black {
