@@ -6,7 +6,7 @@ from beerstat.settings import Settings
 
 
 app_settings = Settings.model_validate({})
-backend = get_backend(app_settings.sqlite_uri)
+backend = get_backend(f'sqlite:///{app_settings.sqlite_uri}')
 migrations = read_migrations("./migrations")
 
 
