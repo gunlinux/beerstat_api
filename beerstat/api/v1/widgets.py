@@ -1,9 +1,10 @@
 from dataclasses import asdict
-from typing import Any, Annotated
+from typing import Annotated
 
 import aiosqlite
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fasthx import hx
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.templating import Jinja2Templates
+from fasthx.jinja import Jinja
 
 from beerstat.api.deps import get_db_connection
 from beerstat.models import Widget
@@ -16,45 +17,7 @@ from beerstat.settings import Settings
 DependsDBConn = Annotated[aiosqlite.Connection, Depends(get_db_connection)]
 widgets_router = APIRouter()
 app_settings = Settings.model_validate({})
-
-
-async def render_widget(
-    _: list[dict[str, str]],
-    *,
-    context: dict[str, Any],
-    request: Any,
-) -> str:
-    widget_id = context["widget_id"]
-    db_conn = context["db_conn"]
-    widget = await GetWidget(repo=WidgetRepo(connection=db_conn)).execute(widget_id)
-    return widget.template
-
-
-async def render_widgets(
-    _: list[dict[str, str]],
-    *,
-    context: dict[str, Any],
-    request: Request,
-) -> str:
-    db_conn = context["db_conn"]
-    widgets = await GetWidgets(repo=WidgetRepo(connection=db_conn)).execute()
-    out = []
-    # full_reload = sum(widget.showtime) + sleep*widgets
-    # sleep = 30sec
-    delay = 0
-    sleep_timeout = app_settings.showtime
-
-    for widget in widgets:
-        out.append(f"""
-        <div 
-            hx-swap="posts"
-            hx-get="{request.url_for("widget_get", widget_id=widget.id)}"
-            hx-trigger="load {"" if not delay else f"delay:{delay}s"}"
-            hx-target=".widget"
-        >
-        </div>""")
-        delay = delay + sleep_timeout + widget.showtime
-    return "".join(out)
+jinja = Jinja(Jinja2Templates("templates"))
 
 
 @widgets_router.post("/", status_code=201)
@@ -75,23 +38,35 @@ async def widget_add(
     return result
 
 
-@widgets_router.get("/", status_code=201)
-@hx(render_widgets)  # type: ignore[arg-type]
+@widgets_router.get("/")
+@jinja.hx("widgets.htmx")
 async def widgets_get(
     db_conn: DependsDBConn,
 ) -> list[Widget]:
     try:
-        return [
-            Widget(**asdict(r))
-            for r in await GetWidgets(repo=WidgetRepo(connection=db_conn)).execute()
-        ]
+        out = []
+        delay = 0
+        sleep_timeout = app_settings.showtime
+        for r in await GetWidgets(repo=WidgetRepo(connection=db_conn)).execute():
+            out.append(
+                Widget(
+                    id=r.id,
+                    name=r.name,
+                    timeout=r.timeout,
+                    showtime=r.showtime,
+                    template=r.template,
+                    sleep=delay,
+                )
+            )
+            delay = delay + sleep_timeout + r.showtime
+        return out
 
     except RepoError:
         raise HTTPException(status_code=500)
 
 
-@widgets_router.get("/{widget_id}", status_code=201)
-@hx(render_widget)  # type: ignore[arg-type]
+@widgets_router.get("/{widget_id}")
+@jinja.hx("widget.htmx")
 async def widget_get(
     widget_id: int,
     db_conn: DependsDBConn,

@@ -2,45 +2,39 @@ from typing import Annotated
 from dataclasses import asdict
 
 import aiosqlite
-from fastapi import APIRouter, Depends, Request, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
-from starlette.templating import _TemplateResponse
+from fasthx.jinja import Jinja
 
 from beerstat.settings import Settings
 from beerstat.api.deps import get_db_connection
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.repo.exceptions import RepoError
 from beerstat.usecases.widgets import GetWidgetsStat, GetWidget
-from beerstat.models import Widget
+from beerstat.models import Widget, WidgetStat
 
 
 DependsDBConn = Annotated[aiosqlite.Connection, Depends(get_db_connection)]
 
 
 widgets_page = APIRouter()
-templates = Jinja2Templates("templates")
 app_settings = Settings.model_validate({})
+jinja = Jinja(Jinja2Templates("templates"))
 
 
-@widgets_page.get("/", response_class=HTMLResponse)
-async def index(request: Request, db_conn: DependsDBConn) -> _TemplateResponse:
+@widgets_page.get("/")
+@jinja.page("index.html")
+async def index(db_conn: DependsDBConn) -> WidgetStat:
     stat = await GetWidgetsStat(repo=WidgetRepo(connection=db_conn)).execute()
-
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "sleep_time": app_settings.showtime * stat.count + stat.timeout,
-            "showtime": app_settings.showtime * 1000,
-        },
+    return WidgetStat(
+        sleep_time=app_settings.showtime * stat.count + stat.timeout,
+        showtime=app_settings.showtime * 1000,
     )
 
 
-@widgets_page.get("/{widget_id}", response_class=HTMLResponse)
-async def widget_page(
-    widget_id: int, request: Request, db_conn: DependsDBConn
-) -> _TemplateResponse:
+@widgets_page.get("/{widget_id}")
+@jinja.hx("widget.htmx")
+async def widget_page(widget_id: int, db_conn: DependsDBConn) -> Widget:
     try:
         result = Widget(
             **asdict(
@@ -49,7 +43,4 @@ async def widget_page(
         )
     except RepoError:
         raise HTTPException(status_code=500)
-
-    return templates.TemplateResponse(
-        request=request, name="widget.html", context={"item": result}
-    )
+    return result
