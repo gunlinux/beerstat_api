@@ -7,7 +7,7 @@ class DonateDTO:
     id: int
     name: str
     date: datetime | None
-    value: int | None
+    value: float | None
 
 
 @dataclass(frozen=True)
