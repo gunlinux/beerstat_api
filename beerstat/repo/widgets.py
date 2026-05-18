@@ -51,7 +51,7 @@ class WidgetRepo:
     async def get_stat(self) -> tuple[int, int]:
         cursor = await self.connection.execute(
             """
-                SELECT sum(showtime), count(id) template FROM widgets
+                SELECT COALESCE(sum(showtime), 0), COALESCE(count(id), 0) FROM widgets
             """
         )
         if result := await cursor.fetchone():
