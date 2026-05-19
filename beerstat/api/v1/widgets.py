@@ -11,6 +11,7 @@ from beerstat.models import Widget
 from beerstat.repo.exceptions import RepoError
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.usecases.widgets import CreateWidget, GetWidget, GetWidgets
+from beerstat.domain.widget import WidgetDTO
 from beerstat.settings import Settings
 
 
@@ -29,7 +30,12 @@ async def widget_add(
         result = Widget(
             **asdict(
                 await CreateWidget(repo=WidgetRepo(connection=db_conn)).execute(
-                    widget_data
+                    WidgetDTO(
+                        name=widget_data.name,
+                        timeout=widget_data.timeout,
+                        showtime=widget_data.showtime,
+                        template=widget_data.template,
+                    )
                 )
             )
         )

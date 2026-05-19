@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-from beerstat.models import Widget
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.domain.widget import WidgetDTO, WidgetStatDTO
 
@@ -9,7 +8,7 @@ from beerstat.domain.widget import WidgetDTO, WidgetStatDTO
 class CreateWidget:
     repo: WidgetRepo
 
-    async def execute(self, widget: Widget) -> WidgetDTO:
+    async def execute(self, widget: WidgetDTO) -> WidgetDTO:
         return await self.repo.add(
             name=widget.name,
             timeout=widget.timeout,

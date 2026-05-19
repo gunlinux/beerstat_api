@@ -14,12 +14,12 @@ class DonateBalance(BaseModel):
 
 
 class Widget(BaseModel):
-    id: int
     name: str
     timeout: int
     showtime: int
     template: str
     sleep: int | None = None
+    id: int | None = None
 
 
 class WidgetStat(BaseModel):
