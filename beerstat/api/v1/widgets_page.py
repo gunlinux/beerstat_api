@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
 
+from beerstat.domain.exceptions import DomainError, NotFoundError
 from beerstat.settings import Settings
 from beerstat.api.deps import get_db_connection
 from beerstat.repo.widgets import WidgetRepo
-from beerstat.repo.exceptions import RepoError
 from beerstat.usecases.widgets import GetWidgetsStat, GetWidget
 from beerstat.models import Widget, WidgetStat
 
@@ -25,7 +25,10 @@ jinja = Jinja(Jinja2Templates("templates"))
 @widgets_page.get("/")
 @jinja.page("index.html")
 async def index(db_conn: DependsDBConn) -> WidgetStat:
-    stat = await GetWidgetsStat(repo=WidgetRepo(connection=db_conn)).execute()
+    try:
+        stat = await GetWidgetsStat(repo=WidgetRepo(connection=db_conn)).execute()
+    except DomainError:
+        raise HTTPException(status_code=500)
     return WidgetStat(
         sleep_time=app_settings.showtime * stat.count + stat.timeout,
         showtime=app_settings.showtime * 1000,
@@ -41,6 +44,6 @@ async def widget_page(widget_id: int, db_conn: DependsDBConn) -> Widget:
                 await GetWidget(repo=WidgetRepo(connection=db_conn)).execute(widget_id)
             )
         )
-    except RepoError:
-        raise HTTPException(status_code=500)
+    except NotFoundError:
+        raise HTTPException(status_code=404)
     return result

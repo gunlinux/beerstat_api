@@ -51,12 +51,14 @@ class WidgetRepo:
     async def get_stat(self) -> tuple[int, int]:
         cursor = await self.connection.execute(
             """
-                SELECT COALESCE(sum(showtime), 0), COALESCE(count(id), 0) FROM widgets
+                SELECT sum(showtime), count(id) FROM widgets
             """
         )
         if result := await cursor.fetchone():
-            return (result[0], result[1])
-        return (0, 0)
+            showtime, count = result
+            if showtime is not None and count is not None:
+                return (showtime, count)
+        raise RepoError
 
     async def get_all(self) -> list[WidgetDTO]:
         cursor = await self.connection.execute(
