@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class Donate(BaseModel):
     name: str
     value: float
-    date: datetime | None = None
+    date: datetime
 
 
 class DonateBalance(BaseModel):

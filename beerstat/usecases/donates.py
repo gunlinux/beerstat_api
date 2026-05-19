@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
 
 from beerstat.domain.exceptions import DomainError
 from beerstat.repo.donates import DonateRepo
@@ -12,9 +11,9 @@ class CreateDonate:
 
     async def execute(self, donate: DonateDTO) -> DonateDTO:
         return await self.repo.add_balance(
-            name=donate.name or "Anonym",
+            name=donate.name,
             value=donate.value,
-            date=donate.date or datetime.now(),
+            date=donate.date,
         )
 
 
