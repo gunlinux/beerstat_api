@@ -2,12 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class DonateDTO:
     name: str
-    date: datetime | None
     value: float
+    date: datetime
     id: int | None = None
+
+    def __post_init__(self):
+        self.name = self.name or "Anonym"
 
 
 @dataclass(frozen=True)
