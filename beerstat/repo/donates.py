@@ -26,9 +26,7 @@ class DonateRepo:
         raise RepoError
 
     async def get_balance(self) -> float | None:
-        cursor = await self.connection.execute(
-            "SELECT COALESCE(SUM(value), 0) FROM donations"
-        )
+        cursor = await self.connection.execute("SELECT SUM(value) FROM donations")
         if balance := await cursor.fetchone():
             return balance[0]
         return None

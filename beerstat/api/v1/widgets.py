@@ -7,8 +7,8 @@ from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
 
 from beerstat.api.deps import get_db_connection
+from beerstat.domain.exceptions import NotFoundError
 from beerstat.models import Widget
-from beerstat.repo.exceptions import RepoError
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.usecases.widgets import CreateWidget, GetWidget, GetWidgets
 from beerstat.domain.widget import WidgetDTO
@@ -26,22 +26,18 @@ async def widget_add(
     widget_data: Widget,
     db_conn: aiosqlite.Connection = Depends(get_db_connection),
 ) -> Widget:
-    try:
-        result = Widget(
-            **asdict(
-                await CreateWidget(repo=WidgetRepo(connection=db_conn)).execute(
-                    WidgetDTO(
-                        name=widget_data.name,
-                        timeout=widget_data.timeout,
-                        showtime=widget_data.showtime,
-                        template=widget_data.template,
-                    )
+    return Widget(
+        **asdict(
+            await CreateWidget(repo=WidgetRepo(connection=db_conn)).execute(
+                WidgetDTO(
+                    name=widget_data.name,
+                    timeout=widget_data.timeout,
+                    showtime=widget_data.showtime,
+                    template=widget_data.template,
                 )
             )
         )
-    except RepoError:
-        raise HTTPException(status_code=500)
-    return result
+    )
 
 
 @widgets_router.get("/")
@@ -49,26 +45,22 @@ async def widget_add(
 async def widgets_get(
     db_conn: DependsDBConn,
 ) -> list[Widget]:
-    try:
-        out = []
-        delay = 0
-        sleep_timeout = app_settings.showtime
-        for r in await GetWidgets(repo=WidgetRepo(connection=db_conn)).execute():
-            out.append(
-                Widget(
-                    id=r.id,
-                    name=r.name,
-                    timeout=r.timeout,
-                    showtime=r.showtime,
-                    template=r.template,
-                    sleep=delay,
-                )
+    out = []
+    delay = 0
+    sleep_timeout = app_settings.showtime
+    for r in await GetWidgets(repo=WidgetRepo(connection=db_conn)).execute():
+        out.append(
+            Widget(
+                id=r.id,
+                name=r.name,
+                timeout=r.timeout,
+                showtime=r.showtime,
+                template=r.template,
+                sleep=delay,
             )
-            delay = delay + sleep_timeout + r.showtime
-        return out
-
-    except RepoError:
-        raise HTTPException(status_code=500)
+        )
+        delay = delay + sleep_timeout + r.showtime
+    return out
 
 
 @widgets_router.get("/{widget_id}")
@@ -83,6 +75,6 @@ async def widget_get(
                 await GetWidget(repo=WidgetRepo(connection=db_conn)).execute(widget_id)
             )
         )
-    except RepoError:
-        raise HTTPException(status_code=500)
+    except NotFoundError:
+        raise HTTPException(status_code=404)
     return result
