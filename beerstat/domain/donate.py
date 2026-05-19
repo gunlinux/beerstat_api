@@ -4,10 +4,10 @@ from datetime import datetime
 
 @dataclass(frozen=True)
 class DonateDTO:
-    id: int
     name: str
     date: datetime | None
-    value: float | None
+    value: float
+    id: int | None = None
 
 
 @dataclass(frozen=True)

@@ -9,6 +9,7 @@ from beerstat.repo.donates import DonateRepo
 from beerstat.models import Donate, DonateBalance
 from beerstat.repo.exceptions import RepoError
 from beerstat.usecases.donates import CreateDonate, GetBalance
+from beerstat.domain.donate import DonateDTO
 
 
 donates_router = APIRouter()
@@ -23,7 +24,11 @@ async def donate(
         result = Donate(
             **asdict(
                 await CreateDonate(repo=DonateRepo(connection=db_conn)).execute(
-                    donate_data
+                    DonateDTO(
+                        name=donate_data.name,
+                        date=donate_data.date,
+                        value=donate_data.value,
+                    )
                 )
             )
         )
