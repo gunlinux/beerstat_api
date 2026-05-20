@@ -5,7 +5,7 @@
   {% if loop.first %}
         hx-trigger="load"
   {% else %}
-        hx-trigger="load delay:{widget.sleep}s"
+        hx-trigger="load delay:{{widget.sleep}}s"
   {% endif %}
         hx-target=".widget"
   ></div>
