@@ -29,6 +29,7 @@ async def lifespan(app: FastAPI):
         pool_size=10,
     )  # pyright: ignore[reportArgumentType]
     app.state.db_pool = db_pool
+    app.state.settings = Settings.model_validate(({}))
     yield
     await db_pool.close()
 

@@ -2,12 +2,11 @@ from typing import Annotated
 from dataclasses import asdict
 
 import aiosqlite
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
 
 from beerstat.domain.exceptions import DomainError, NotFoundError
-from beerstat.settings import Settings
 from beerstat.api.deps import get_db_connection
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.usecases.widgets import GetWidgetsStat, GetWidget
@@ -18,20 +17,19 @@ DependsDBConn = Annotated[aiosqlite.Connection, Depends(get_db_connection)]
 
 
 widgets_page = APIRouter()
-app_settings = Settings.model_validate({})
 jinja = Jinja(Jinja2Templates("templates"))
 
 
 @widgets_page.get("/")
 @jinja.page("index.html")
-async def index(db_conn: DependsDBConn) -> WidgetStat:
+async def index(db_conn: DependsDBConn, request: Request) -> WidgetStat:
     try:
         stat = await GetWidgetsStat(repo=WidgetRepo(connection=db_conn)).execute()
     except DomainError:
         raise HTTPException(status_code=500)
     return WidgetStat(
-        sleep_time=app_settings.showtime * stat.count + stat.timeout,
-        showtime=app_settings.showtime * 1000,
+        sleep_time=request.app.state.settings.showtime * stat.count + stat.timeout,
+        showtime=request.app.state.settings.showtime * 1000,
     )
 
 
