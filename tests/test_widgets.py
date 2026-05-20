@@ -1,9 +1,15 @@
 import pytest
+import typing
 
 from beerstat.domain.exceptions import WidgetNotFoundError
 from beerstat.domain.widget import WidgetDTO, WidgetStatDTO
 from beerstat.repo.widgets import WidgetRepo
-from beerstat.usecases.widgets import CreateWidget, GetWidget, GetWidgets, GetWidgetsStat
+from beerstat.usecases.widgets import (
+    CreateWidget,
+    GetWidget,
+    GetWidgets,
+    GetWidgetsStat,
+)
 
 
 class TestCreateWidget:
@@ -25,10 +31,13 @@ class TestCreateWidget:
 class TestGetWidget:
     async def test_get_existing_widget(self, db_connection):
         repo = WidgetRepo(connection=db_connection)
-        created = await repo.add(name="slider", timeout=5, showtime=3, template="<div/>")
+        created = await repo.add(
+            name="slider", timeout=5, showtime=3, template="<div/>"
+        )
 
         use_case = GetWidget(repo=repo)
-        result = await use_case.execute(created.id)
+        assert created is not None
+        result = await use_case.execute(typing.cast(int, created.id))
 
         assert result.id == created.id
         assert result.name == "slider"

@@ -1,8 +1,5 @@
 from datetime import datetime
 
-import pytest
-import httpx
-
 
 class TestDonateEndpoint:
     async def test_post_donate_returns_201(self, client):
