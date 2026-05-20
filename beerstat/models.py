@@ -7,6 +7,7 @@ class Donate(BaseModel):
     name: str
     value: float
     date: datetime
+    id: int | None = None
 
 
 class DonateBalance(BaseModel):
