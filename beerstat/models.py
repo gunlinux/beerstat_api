@@ -19,7 +19,6 @@ class Widget(BaseModel):
     timeout: int
     showtime: int
     template: str
-    sleep: int | None = None
     id: int | None = None
 
 

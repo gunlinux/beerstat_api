@@ -8,9 +8,3 @@ class WidgetDTO:
     showtime: int
     template: str
     id: int | None = None
-
-
-@dataclass(frozen=True)
-class WidgetStatDTO:
-    timeout: int
-    count: int

@@ -1,8 +1,6 @@
 from typing import AsyncGenerator
 
 from fastapi import Request, Depends
-from beerstat.repo.donates import DonateRepo
-from beerstat.repo.widgets import WidgetRepo
 import aiosqlite
 
 
@@ -25,9 +23,13 @@ async def get_db_connection(
         yield conn
 
 
-async def get_donate_repo(db_conn: aiosqlite.Connection = Depends(get_db_connection)):
-    return DonateRepo(db_conn)
+async def get_donate_repo(
+    request: Request, db_conn: aiosqlite.Connection = Depends(get_db_connection)
+):
+    return request.app.state.repo_factory.donate_repo(db_conn)
 
 
-async def get_widget_repo(db_conn: aiosqlite.Connection = Depends(get_db_connection)):
-    return WidgetRepo(db_conn)
+async def get_widget_repo(
+    request: Request, db_conn: aiosqlite.Connection = Depends(get_db_connection)
+):
+    return request.app.state.repo_factory.widget_repo(db_conn)

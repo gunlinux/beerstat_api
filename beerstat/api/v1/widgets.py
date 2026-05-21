@@ -1,6 +1,6 @@
 from dataclasses import asdict
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
 
@@ -36,27 +36,19 @@ async def widget_add(
 
 
 @widgets_router.get("/")
-@jinja.hx("widgets.htmx")
 async def widgets_get(
-    request: Request,
     widget_repo: WidgetRepo = Depends(get_widget_repo),
 ) -> list[Widget]:
-    out = []
-    delay = 0
-    sleep_timeout = request.app.state.settings.showtime
-    for r in await GetWidgets(repo=widget_repo).execute():
-        out.append(
-            Widget(
-                id=r.id,
-                name=r.name,
-                timeout=r.timeout,
-                showtime=r.showtime,
-                template=r.template,
-                sleep=delay,
-            )
+    return [
+        Widget(
+            id=r.id,
+            name=r.name,
+            timeout=r.timeout,
+            showtime=r.showtime,
+            template=r.template,
         )
-        delay = delay + sleep_timeout + r.showtime
-    return out
+        for r in await GetWidgets(repo=widget_repo).execute()
+    ]
 
 
 @widgets_router.get("/{widget_id}")
@@ -66,11 +58,7 @@ async def widget_get(
     widget_repo: WidgetRepo = Depends(get_widget_repo),
 ) -> Widget:
     try:
-        result = Widget(
-            **asdict(
-                await GetWidget(repo=widget_repo).execute(widget_id)
-            )
-        )
+        result = Widget(**asdict(await GetWidget(repo=widget_repo).execute(widget_id)))
     except NotFoundError:
         raise HTTPException(status_code=404)
     return result

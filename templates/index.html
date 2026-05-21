@@ -2,30 +2,54 @@
 
 {% block footer %}
 <script>
-  document.body.addEventListener('htmx:afterSwap', function(evt) {
-    var widget = document.body.querySelector(".widget");
-    console.log('fire afterSwap on ', widget);
-    widget.classList.add('widget--visible');
-      setTimeout(() => {
-          console.log('hide content');
-          widget.classList.remove('widget--visible');
-      }, {{showtime}}); // 3000 milliseconds = 3 seconds
+  const slot = document.getElementById("widget-slot");
 
-  });
-  //htmx.logAll()
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function fetchPlaylist() {
+    const res = await fetch("/widget/");
+    let temp = await res.json();
+    return temp;
+  }
+
+  async function fetchWidget(id) {
+    const headers = new Headers();
+    headers.append("hx-request", "true")
+    const res = await fetch(`/widget/${id}`, { headers: headers });
+    return await res.text();
+  }
+
+  async function playCycle() {
+    while (true) {
+      const widgets = await fetchPlaylist();
+
+      for (const w of widgets) {
+        const html = await fetchWidget(w.id);
+
+        slot.innerHTML = html;
+
+        // important
+        htmx.process(slot);
+
+        slot.classList.add("widget--visible");
+
+        await sleep(w.showtime * 1000);
+        console.log('sleep over');
+        console.log(w.showtime);
+
+        slot.classList.remove("widget--visible");
+
+        await sleep(w.timeout * 1000);
+      }
+    }
+  }
+
+  playCycle();
 </script>
 {% endblock %}
 
 {% block content %}
-  <div
-    hx-swap="posts" 
-    hx-get="/widget/"
-    hx-trigger="every {{sleep_time}}s"
-    hx-target=".widget_lists">
-  </div>
-  <div class="widget_lists"></div>
-
-  <article class="widget">
+  <article class="widget" id="widget-slot">
     start widget
   </article>
 {% endblock content %}

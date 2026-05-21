@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 from beerstat.repo.exceptions import RepoError
 from beerstat.repo.widgets import WidgetRepo
-from beerstat.domain.widget import WidgetDTO, WidgetStatDTO
-from beerstat.domain.exceptions import DomainError, WidgetNotFoundError
+from beerstat.domain.widget import WidgetDTO
+from beerstat.domain.exceptions import WidgetNotFoundError
 
 
 @dataclass
@@ -36,15 +36,3 @@ class GetWidgets:
 
     async def execute(self) -> list[WidgetDTO]:
         return await self.repo.get_all()
-
-
-@dataclass
-class GetWidgetsStat:
-    repo: WidgetRepo
-
-    async def execute(self) -> WidgetStatDTO:
-        try:
-            timeout, count = await self.repo.get_stat()
-            return WidgetStatDTO(timeout=timeout, count=count)
-        except RepoError:
-            raise DomainError
