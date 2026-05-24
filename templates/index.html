@@ -19,9 +19,16 @@
     return await res.text();
   }
 
+  const EMPTY_PLAYLIST_SLEEP_MS = 5000;
+
   async function playCycle() {
     while (true) {
       const widgets = await fetchPlaylist();
+
+      if (widgets.length === 0) {
+        await sleep(EMPTY_PLAYLIST_SLEEP_MS);
+        continue;
+      }
 
       for (const w of widgets) {
         const html = await fetchWidget(w.id);
