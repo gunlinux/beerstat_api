@@ -1,11 +1,24 @@
-from beerstat.repo.widgets import WidgetRepo
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+from typing import cast
+
+import aiosqlite
+from aiosqlitepool import SQLiteConnectionPool
+
 from beerstat.repo.donates import DonateRepo
-from aiosqlite import Connection
+from beerstat.repo.widgets import WidgetRepo
 
 
 class RepoFactory:
-    def donate_repo(self, connection: Connection) -> DonateRepo:
-        return DonateRepo(connection=connection)
+    def __init__(self, pool: SQLiteConnectionPool):
+        self._pool = pool
 
-    def widget_repo(self, connection: Connection) -> WidgetRepo:
-        return WidgetRepo(connection=connection)
+    @asynccontextmanager
+    async def donate_repo(self) -> AsyncGenerator[DonateRepo]:
+        async with self._pool.connection() as conn:
+            yield DonateRepo(connection=cast(aiosqlite.Connection, conn))
+
+    @asynccontextmanager
+    async def widget_repo(self) -> AsyncGenerator[WidgetRepo]:
+        async with self._pool.connection() as conn:
+            yield WidgetRepo(connection=cast(aiosqlite.Connection, conn))

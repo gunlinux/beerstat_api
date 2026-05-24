@@ -61,7 +61,7 @@ async def client():
         )  # pyright: ignore[reportArgumentType]
         app.state.db_pool = db_pool
         app.state.settings = app_settings
-        app.state.repo_factory = RepoFactory()
+        app.state.repo_factory = RepoFactory(db_pool)
 
         yield
 

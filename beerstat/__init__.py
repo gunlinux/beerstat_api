@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
     )  # pyright: ignore[reportArgumentType]
     app.state.db_pool = db_pool
     app.state.settings = settings
-    app.state.repo_factory = RepoFactory()
+    app.state.repo_factory = RepoFactory(db_pool)
     yield
     await db_pool.close()
 

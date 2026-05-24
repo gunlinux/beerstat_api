@@ -1,8 +1,11 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
-from fastapi import Request, Depends
+from fastapi import Request
 import aiosqlite
 
+from beerstat.repo.donates import DonateRepo
+from beerstat.repo.factory import RepoFactory
+from beerstat.repo.widgets import WidgetRepo
 from beerstat.settings import Settings
 
 
@@ -15,26 +18,17 @@ async def sqlite_connection(db_uri: str) -> aiosqlite.Connection:
     return conn
 
 
-async def get_db_connection(
-    request: Request,
-) -> AsyncGenerator[aiosqlite.Connection, None]:
-    db_pool = request.app.state.db_pool
-
-    async with db_pool.connection() as conn:
-        yield conn
-
-
 async def get_settings(request: Request) -> Settings:
     return request.app.state.settings
 
 
-async def get_donate_repo(
-    request: Request, db_conn: aiosqlite.Connection = Depends(get_db_connection)
-):
-    return request.app.state.repo_factory.donate_repo(db_conn)
+async def get_donate_repo(request: Request) -> AsyncGenerator[DonateRepo, None]:
+    factory: RepoFactory = request.app.state.repo_factory
+    async with factory.donate_repo() as repo:
+        yield repo
 
 
-async def get_widget_repo(
-    request: Request, db_conn: aiosqlite.Connection = Depends(get_db_connection)
-):
-    return request.app.state.repo_factory.widget_repo(db_conn)
+async def get_widget_repo(request: Request) -> AsyncGenerator[WidgetRepo, None]:
+    factory: RepoFactory = request.app.state.repo_factory
+    async with factory.widget_repo() as repo:
+        yield repo
