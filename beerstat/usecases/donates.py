@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
 from beerstat.domain.exceptions import DomainError
-from beerstat.repo.donates import DonateRepo
+from beerstat.domain.ports import DonateRepoPort
 from beerstat.repo.exceptions import RepoError
 from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
 
 
 @dataclass
 class CreateDonate:
-    repo: DonateRepo
+    repo: DonateRepoPort
 
     async def execute(self, donate: DonateDTO) -> DonateDTO:
         try:
@@ -23,7 +23,7 @@ class CreateDonate:
 
 @dataclass
 class GetBalance:
-    repo: DonateRepo
+    repo: DonateRepoPort
 
     async def execute(self) -> DonateBalanceDTO:
         balance = await self.repo.get_balance()

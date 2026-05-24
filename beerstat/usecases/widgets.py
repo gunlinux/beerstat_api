@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
+from beerstat.domain.ports import WidgetRepoPort
 from beerstat.repo.exceptions import RepoError
-from beerstat.repo.widgets import WidgetRepo
 from beerstat.domain.widget import WidgetDTO
 from beerstat.domain.exceptions import WidgetNotFoundError, CreateError
 
 
 @dataclass
 class CreateWidget:
-    repo: WidgetRepo
+    repo: WidgetRepoPort
 
     async def execute(self, widget: WidgetDTO) -> WidgetDTO:
         try:
@@ -24,7 +24,7 @@ class CreateWidget:
 
 @dataclass
 class GetWidget:
-    repo: WidgetRepo
+    repo: WidgetRepoPort
 
     async def execute(self, widget_id: int) -> WidgetDTO:
         try:
@@ -35,7 +35,7 @@ class GetWidget:
 
 @dataclass
 class GetWidgets:
-    repo: WidgetRepo
+    repo: WidgetRepoPort
 
     async def execute(self) -> list[WidgetDTO]:
         try:
