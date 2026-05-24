@@ -1,5 +1,4 @@
 from datetime import datetime
-import pytest
 
 
 class TestDonateEndpoint:
@@ -14,7 +13,6 @@ class TestDonateEndpoint:
         assert data["value"] == 10.0
         assert "id" in data
 
-    @pytest.mark.asyncio
     async def test_get_balance_with_donations(self, client):
         # seed a donation
         await client.post(
@@ -88,3 +86,11 @@ class TestWidgetEndpoints:
         resp = await client.get("/widget/")
         assert resp.status_code == 200
         assert len(resp.json()) == 1
+
+    async def test_create_widget_without_showtime_uses_settings_default(self, client):
+        resp = await client.post(
+            "/widget/",
+            json={"name": "no_showtime", "timeout": 5, "template": "<div/>"},
+        )
+        assert resp.status_code == 201
+        assert resp.json()["showtime"] == 30  # settings default

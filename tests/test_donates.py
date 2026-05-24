@@ -1,3 +1,4 @@
+from dataclasses import FrozenInstanceError
 from datetime import datetime
 
 import pytest
@@ -49,3 +50,24 @@ class TestGetBalance:
 
         with pytest.raises(DomainError):
             await use_case.execute()
+
+    async def test_zero_total_balance_returns_dto(self, db_connection):
+        repo = DonateRepo(connection=db_connection)
+        await repo.add_balance(name="Alice", value=0.0, date=datetime.now())
+
+        use_case = GetBalance(repo=repo)
+        result = await use_case.execute()
+
+        assert isinstance(result, DonateBalanceDTO)
+        assert result.total == 0.0
+
+
+class TestDonateDTO:
+    def test_dto_is_frozen(self):
+        dto = DonateDTO(name="Alice", value=5.0, date=datetime.now())
+        with pytest.raises(FrozenInstanceError):
+            dto.name = "Bob"  # type: ignore[misc]
+
+    def test_anonym_substitution_via_post_init(self):
+        dto = DonateDTO(name="", value=1.0, date=datetime.now())
+        assert dto.name == "Anonym"

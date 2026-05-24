@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 
-@dataclass(frozen=False)
+@dataclass(frozen=True)
 class DonateDTO:
     name: str
     value: float
@@ -10,7 +10,7 @@ class DonateDTO:
     id: int | None = None
 
     def __post_init__(self):
-        self.name = self.name or "Anonym"
+        object.__setattr__(self, "name", self.name or "Anonym")
 
 
 @dataclass(frozen=True)

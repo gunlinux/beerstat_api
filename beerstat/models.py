@@ -17,7 +17,7 @@ class DonateBalance(BaseModel):
 class Widget(BaseModel):
     name: str
     timeout: int
-    showtime: int
+    showtime: int | None = None
     template: str
     id: int | None = None
 

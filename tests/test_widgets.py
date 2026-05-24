@@ -1,8 +1,10 @@
 import pytest
-import typing
+from typing import cast
+from unittest.mock import AsyncMock
 
-from beerstat.domain.exceptions import WidgetNotFoundError
+from beerstat.domain.exceptions import WidgetNotFoundError, CreateError
 from beerstat.domain.widget import WidgetDTO
+from beerstat.repo.exceptions import RepoError
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.usecases.widgets import (
     CreateWidget,
@@ -36,7 +38,7 @@ class TestGetWidget:
 
         use_case = GetWidget(repo=repo)
         assert created is not None
-        result = await use_case.execute(typing.cast(int, created.id))
+        result = await use_case.execute(cast(int, created.id))
 
         assert result.id == created.id
         assert result.name == "slider"
@@ -70,3 +72,23 @@ class TestGetWidgets:
         names = [w.name for w in result]
         assert "w1" in names
         assert "w2" in names
+
+    async def test_repo_error_raises_create_error(self):
+        mock_repo = AsyncMock()
+        mock_repo.get_all.side_effect = RepoError
+        use_case = GetWidgets(repo=mock_repo)
+
+        with pytest.raises(CreateError):
+            await use_case.execute()
+
+
+class TestCreateWidgetErrors:
+    async def test_repo_error_raises_create_error(self):
+        mock_repo = AsyncMock()
+        mock_repo.add.side_effect = RepoError
+        use_case = CreateWidget(repo=mock_repo)
+
+        with pytest.raises(CreateError):
+            await use_case.execute(
+                WidgetDTO(name="x", timeout=1, showtime=1, template="<x/>")
+            )

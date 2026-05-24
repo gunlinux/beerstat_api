@@ -3,6 +3,8 @@ from typing import AsyncGenerator
 from fastapi import Request, Depends
 import aiosqlite
 
+from beerstat.settings import Settings
+
 
 async def sqlite_connection(db_uri: str) -> aiosqlite.Connection:
     """A factory for creating new connections."""
@@ -13,16 +15,14 @@ async def sqlite_connection(db_uri: str) -> aiosqlite.Connection:
 async def get_db_connection(
     request: Request,
 ) -> AsyncGenerator[aiosqlite.Connection, None]:
-    """
-    A dependency that provides a connection from the pool.
-    It accesses the pool from the application state.
-    """
-    print("forbiden")
     db_pool = request.app.state.db_pool
 
     async with db_pool.connection() as conn:
-        print("yield conn")
         yield conn
+
+
+async def get_settings(request: Request) -> Settings:
+    return request.app.state.settings
 
 
 async def get_donate_repo(

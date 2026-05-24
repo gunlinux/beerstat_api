@@ -4,12 +4,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
 
-from beerstat.domain.exceptions import NotFoundError
+from beerstat.api.deps import get_widget_repo, get_settings
+from beerstat.domain.exceptions import NotFoundError, CreateError
 from beerstat.models import Widget
 from beerstat.repo.widgets import WidgetRepo
+from beerstat.settings import Settings
 from beerstat.usecases.widgets import CreateWidget, GetWidget, GetWidgets
 from beerstat.domain.widget import WidgetDTO
-from beerstat.api.deps import get_widget_repo
 
 
 widgets_router = APIRouter()
@@ -20,19 +21,22 @@ jinja = Jinja(Jinja2Templates("templates"))
 async def widget_add(
     widget_data: Widget,
     widget_repo: WidgetRepo = Depends(get_widget_repo),
+    settings: Settings = Depends(get_settings),
 ) -> Widget:
-    return Widget(
-        **asdict(
-            await CreateWidget(repo=widget_repo).execute(
-                WidgetDTO(
-                    name=widget_data.name,
-                    timeout=widget_data.timeout,
-                    showtime=widget_data.showtime,
-                    template=widget_data.template,
-                )
+    try:
+        result = await CreateWidget(repo=widget_repo).execute(
+            WidgetDTO(
+                name=widget_data.name,
+                timeout=widget_data.timeout,
+                showtime=widget_data.showtime
+                if widget_data.showtime is not None
+                else settings.showtime,
+                template=widget_data.template,
             )
         )
-    )
+    except CreateError:
+        raise HTTPException(status_code=500)
+    return Widget(**asdict(result))
 
 
 @widgets_router.get("/")
