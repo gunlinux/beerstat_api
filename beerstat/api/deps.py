@@ -9,6 +9,9 @@ from beerstat.settings import Settings
 async def sqlite_connection(db_uri: str) -> aiosqlite.Connection:
     """A factory for creating new connections."""
     conn = await aiosqlite.connect(db_uri)
+    await conn.execute("PRAGMA foreign_keys = ON")
+    await conn.execute("PRAGMA journal_mode = WAL")
+    conn.row_factory = aiosqlite.Row
     return conn
 
 
