@@ -1,12 +1,9 @@
-from dataclasses import asdict
-
 from fastapi import APIRouter, Depends
 
 from beerstat.api.deps import get_donate_repo
 from beerstat.repo.donates import DonateRepo
 from beerstat.models import Donate, DonateBalance
 from beerstat.usecases.donates import CreateDonate, GetBalance
-from beerstat.domain.donate import DonateDTO
 
 
 donates_router = APIRouter()
@@ -17,16 +14,8 @@ async def donate(
     donate_data: Donate,
     donate_repo: DonateRepo = Depends(get_donate_repo),
 ) -> Donate:
-    return Donate(
-        **asdict(
-            await CreateDonate(repo=donate_repo).execute(
-                DonateDTO(
-                    name=donate_data.name,
-                    date=donate_data.date,
-                    value=donate_data.value,
-                )
-            )
-        )
+    return Donate.from_dto(
+        await CreateDonate(repo=donate_repo).execute(donate_data.to_dto())
     )
 
 
@@ -34,4 +23,4 @@ async def donate(
 async def get_donations(
     donate_repo: DonateRepo = Depends(get_donate_repo),
 ) -> DonateBalance:
-    return DonateBalance(**asdict(await GetBalance(repo=donate_repo).execute()))
+    return DonateBalance.from_dto(await GetBalance(repo=donate_repo).execute())

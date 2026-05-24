@@ -1,5 +1,3 @@
-from dataclasses import asdict
-
 from fastapi import APIRouter, Depends
 from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
@@ -24,4 +22,4 @@ async def index() -> WidgetStat: ...
 async def widget_page(
     widget_id: int, widget_repo: WidgetRepo = Depends(get_widget_repo)
 ) -> Widget:
-    return Widget(**asdict(await GetWidget(repo=widget_repo).execute(widget_id)))
+    return Widget.from_dto(await GetWidget(repo=widget_repo).execute(widget_id))
