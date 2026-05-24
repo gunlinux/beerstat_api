@@ -1,9 +1,8 @@
 from dataclasses import asdict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from beerstat.api.deps import get_donate_repo
-from beerstat.domain.exceptions import DomainError
 from beerstat.repo.donates import DonateRepo
 from beerstat.models import Donate, DonateBalance
 from beerstat.usecases.donates import CreateDonate, GetBalance
@@ -35,7 +34,4 @@ async def donate(
 async def get_donations(
     donate_repo: DonateRepo = Depends(get_donate_repo),
 ) -> DonateBalance:
-    try:
-        return DonateBalance(**asdict(await GetBalance(repo=donate_repo).execute()))
-    except DomainError:
-        raise HTTPException(status_code=500)
+    return DonateBalance(**asdict(await GetBalance(repo=donate_repo).execute()))

@@ -1,11 +1,10 @@
 from dataclasses import asdict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
 
 from beerstat.api.deps import get_widget_repo, get_settings
-from beerstat.domain.exceptions import NotFoundError, CreateError
 from beerstat.models import Widget
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.settings import Settings
@@ -23,19 +22,16 @@ async def widget_add(
     widget_repo: WidgetRepo = Depends(get_widget_repo),
     settings: Settings = Depends(get_settings),
 ) -> Widget:
-    try:
-        result = await CreateWidget(repo=widget_repo).execute(
-            WidgetDTO(
-                name=widget_data.name,
-                timeout=widget_data.timeout,
-                showtime=widget_data.showtime
-                if widget_data.showtime is not None
-                else settings.showtime,
-                template=widget_data.template,
-            )
+    result = await CreateWidget(repo=widget_repo).execute(
+        WidgetDTO(
+            name=widget_data.name,
+            timeout=widget_data.timeout,
+            showtime=widget_data.showtime
+            if widget_data.showtime is not None
+            else settings.showtime,
+            template=widget_data.template,
         )
-    except CreateError:
-        raise HTTPException(status_code=500)
+    )
     return Widget(**asdict(result))
 
 
@@ -61,8 +57,4 @@ async def widget_get(
     widget_id: int,
     widget_repo: WidgetRepo = Depends(get_widget_repo),
 ) -> Widget:
-    try:
-        result = Widget(**asdict(await GetWidget(repo=widget_repo).execute(widget_id)))
-    except NotFoundError:
-        raise HTTPException(status_code=404)
-    return result
+    return Widget(**asdict(await GetWidget(repo=widget_repo).execute(widget_id)))

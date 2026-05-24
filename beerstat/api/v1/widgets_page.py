@@ -1,10 +1,9 @@
 from dataclasses import asdict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
 
-from beerstat.domain.exceptions import NotFoundError
 from beerstat.api.deps import get_widget_repo
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.usecases.widgets import GetWidget
@@ -25,8 +24,4 @@ async def index() -> WidgetStat: ...
 async def widget_page(
     widget_id: int, widget_repo: WidgetRepo = Depends(get_widget_repo)
 ) -> Widget:
-    try:
-        result = Widget(**asdict(await GetWidget(repo=widget_repo).execute(widget_id)))
-    except NotFoundError:
-        raise HTTPException(status_code=404)
-    return result
+    return Widget(**asdict(await GetWidget(repo=widget_repo).execute(widget_id)))

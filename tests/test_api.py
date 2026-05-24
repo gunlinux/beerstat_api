@@ -94,3 +94,36 @@ class TestWidgetEndpoints:
         )
         assert resp.status_code == 201
         assert resp.json()["showtime"] == 30  # settings default
+
+
+class TestErrorEnvelope:
+    async def test_not_found_returns_envelope(self, client):
+        resp = await client.get("/widget/999")
+
+        assert resp.status_code == 404
+        body = resp.json()
+        assert body["error"] == "not_found"
+        assert body["detail"] == "WidgetNotFoundError"
+
+    async def test_not_found_envelope_on_page_route(self, client):
+        resp = await client.get("/page/999")
+
+        assert resp.status_code == 404
+        body = resp.json()
+        assert body["error"] == "not_found"
+        assert body["detail"] == "WidgetNotFoundError"
+
+    async def test_domain_error_returns_envelope(self, client):
+        resp = await client.get("/balance")
+
+        assert resp.status_code == 500
+        body = resp.json()
+        assert body["error"] == "domain_error"
+        assert body["detail"] == "DomainError"
+
+    async def test_envelope_keys_are_consistent(self, client):
+        not_found = (await client.get("/widget/999")).json()
+        domain_err = (await client.get("/balance")).json()
+
+        assert set(not_found.keys()) == {"error", "detail"}
+        assert set(domain_err.keys()) == {"error", "detail"}
