@@ -16,7 +16,6 @@ class DonateRepo:
         )
         async with cursor:
             if result := await cursor.fetchone():
-                await self.connection.commit()
                 return DonateDTO(
                     id=result[0], name=result[1], date=result[2], value=result[3]
                 )

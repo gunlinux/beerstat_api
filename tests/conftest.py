@@ -46,6 +46,21 @@ async def db_connection():
 
 
 @pytest_asyncio.fixture(scope="function")
+async def repo_factory():
+    app_settings = get_app_settings()
+    migrate(app_settings.sqlite_uri)
+    pool = SQLiteConnectionPool(
+        connection_factory=make_connection_factory(app_settings),  # pyright: ignore[reportArgumentType]
+        pool_size=2,
+    )  # pyright: ignore[reportArgumentType]
+
+    yield RepoFactory(pool)
+
+    await pool.close()
+    os.remove(app_settings.sqlite_uri)
+
+
+@pytest_asyncio.fixture(scope="function")
 async def client():
     """TestClient with an in-memory DB pool for integration tests."""
     from contextlib import asynccontextmanager
