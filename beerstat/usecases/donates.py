@@ -27,6 +27,4 @@ class GetBalance:
 
     async def execute(self) -> DonateBalanceDTO:
         balance = await self.repo.get_balance()
-        if balance is not None:
-            return DonateBalanceDTO(total=balance)
-        raise DomainError
+        return DonateBalanceDTO(total=balance if balance is not None else 0.0)

@@ -27,9 +27,10 @@ class TestDonateEndpoint:
         assert resp.status_code == 200
         assert resp.json()["total"] == 50.0
 
-    async def test_get_empty_balance_returns_500(self, client):
+    async def test_get_empty_balance_returns_zero(self, client):
         resp = await client.get("/balance")
-        assert resp.status_code == 500
+        assert resp.status_code == 200
+        assert resp.json()["total"] == 0.0
 
 
 class TestWidgetEndpoints:
@@ -113,17 +114,7 @@ class TestErrorEnvelope:
         assert body["error"] == "not_found"
         assert body["detail"] == "WidgetNotFoundError"
 
-    async def test_domain_error_returns_envelope(self, client):
-        resp = await client.get("/balance")
-
-        assert resp.status_code == 500
-        body = resp.json()
-        assert body["error"] == "domain_error"
-        assert body["detail"] == "DomainError"
-
-    async def test_envelope_keys_are_consistent(self, client):
+    async def test_not_found_envelope_keys(self, client):
         not_found = (await client.get("/widget/999")).json()
-        domain_err = (await client.get("/balance")).json()
 
         assert set(not_found.keys()) == {"error", "detail"}
-        assert set(domain_err.keys()) == {"error", "detail"}

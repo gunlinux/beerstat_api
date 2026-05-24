@@ -4,7 +4,6 @@ from datetime import datetime
 import pytest
 
 from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
-from beerstat.domain.exceptions import DomainError
 from beerstat.repo.donates import DonateRepo
 from beerstat.usecases.donates import CreateDonate, GetBalance
 
@@ -44,12 +43,14 @@ class TestGetBalance:
         assert isinstance(result, DonateBalanceDTO)
         assert result.total == 30.0
 
-    async def test_empty_balance_raises_domain_error(self, db_connection):
+    async def test_empty_balance_returns_zero(self, db_connection):
         repo = DonateRepo(connection=db_connection)
         use_case = GetBalance(repo=repo)
 
-        with pytest.raises(DomainError):
-            await use_case.execute()
+        result = await use_case.execute()
+
+        assert isinstance(result, DonateBalanceDTO)
+        assert result.total == 0.0
 
     async def test_zero_total_balance_returns_dto(self, db_connection):
         repo = DonateRepo(connection=db_connection)

@@ -1,13 +1,12 @@
-from dataclasses import dataclass
 from datetime import datetime
 from aiosqlite import Connection
 from beerstat.domain.donate import DonateDTO
 from beerstat.repo.exceptions import RepoError
 
 
-@dataclass
 class DonateRepo:
-    connection: Connection
+    def __init__(self, connection: Connection) -> None:
+        self.connection = connection
 
     async def add_balance(self, name: str, value: float, date: datetime) -> DonateDTO:
         cursor = await self.connection.execute(

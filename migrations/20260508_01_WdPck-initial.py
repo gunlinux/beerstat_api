@@ -7,7 +7,8 @@ from yoyo import step
 __depends__ = {}
 
 steps = [
-    step("""
+    step(
+        """
         CREATE TABLE IF NOT EXISTS donations (
             id INTEGER NOT NULL,
             name VARCHAR(30),
@@ -15,5 +16,7 @@ steps = [
             value FLOAT,
             PRIMARY KEY (id)
         );
-    """)
+        """,
+        "DROP TABLE donations;",
+    )
 ]

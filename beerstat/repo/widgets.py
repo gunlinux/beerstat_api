@@ -1,13 +1,12 @@
-from dataclasses import dataclass
 from aiosqlite import Connection
 from beerstat.domain.widget import WidgetDTO
 
 from beerstat.repo.exceptions import RepoError
 
 
-@dataclass
 class WidgetRepo:
-    connection: Connection
+    def __init__(self, connection: Connection) -> None:
+        self.connection = connection
 
     async def add(
         self, name: str, timeout: int, showtime: int, template: str

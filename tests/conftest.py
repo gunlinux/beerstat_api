@@ -84,11 +84,7 @@ async def client():
         os.remove(app_settings.sqlite_uri)
 
     app = create_app(test_lifespan)
-    lifespan_cm = app.router.lifespan_context(app)
-    await lifespan_cm.__aenter__()  # type: ignore[attr-defined]
-
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
-
-    await lifespan_cm.__aexit__(None, None, None)  # type: ignore[attr-defined]
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            yield ac

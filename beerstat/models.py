@@ -4,7 +4,7 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
     from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class DonateCreateIn(BaseModel):
     name: str
-    value: float
+    value: float = Field(gt=0)
     date: datetime
 
     def to_dto(self) -> DonateDTO:
@@ -43,8 +43,8 @@ class DonateBalance(BaseModel):
 
 class WidgetCreateIn(BaseModel):
     name: str
-    timeout: int
-    showtime: int | None = None
+    timeout: int = Field(gt=0)
+    showtime: int | None = Field(default=None, gt=0)
     template: str
 
     def to_dto(self, *, showtime_default: int) -> WidgetDTO:
