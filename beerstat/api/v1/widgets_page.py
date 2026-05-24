@@ -5,7 +5,7 @@ from fasthx.jinja import Jinja
 from beerstat.api.deps import get_widget_repo
 from beerstat.repo.widgets import WidgetRepo
 from beerstat.usecases.widgets import GetWidget
-from beerstat.models import Widget, WidgetStat
+from beerstat.models import WidgetOut, WidgetStat
 
 
 widgets_page = APIRouter()
@@ -21,5 +21,5 @@ async def index() -> WidgetStat: ...
 @jinja.hx("widget.htmx")
 async def widget_page(
     widget_id: int, widget_repo: WidgetRepo = Depends(get_widget_repo)
-) -> Widget:
-    return Widget.from_dto(await GetWidget(repo=widget_repo).execute(widget_id))
+) -> WidgetOut:
+    return WidgetOut.from_dto(await GetWidget(repo=widget_repo).execute(widget_id))

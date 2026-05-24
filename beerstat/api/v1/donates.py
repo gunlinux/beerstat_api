@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from beerstat.api.deps import get_donate_repo
 from beerstat.repo.donates import DonateRepo
-from beerstat.models import Donate, DonateBalance
+from beerstat.models import DonateCreateIn, DonateOut, DonateBalance
 from beerstat.usecases.donates import CreateDonate, GetBalance
 
 
@@ -11,10 +11,10 @@ donates_router = APIRouter()
 
 @donates_router.post("/donate", status_code=201)
 async def donate(
-    donate_data: Donate,
+    donate_data: DonateCreateIn,
     donate_repo: DonateRepo = Depends(get_donate_repo),
-) -> Donate:
-    return Donate.from_dto(
+) -> DonateOut:
+    return DonateOut.from_dto(
         await CreateDonate(repo=donate_repo).execute(donate_data.to_dto())
     )
 
