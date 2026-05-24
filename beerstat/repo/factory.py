@@ -4,7 +4,7 @@ from aiosqlite import Connection
 
 
 class RepoFactory:
-    def donat_repo(self, connection: Connection) -> DonateRepo:
+    def donate_repo(self, connection: Connection) -> DonateRepo:
         return DonateRepo(connection=connection)
 
     def widget_repo(self, connection: Connection) -> WidgetRepo:

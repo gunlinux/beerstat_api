@@ -1,4 +1,5 @@
 from datetime import datetime
+import pytest
 
 
 class TestDonateEndpoint:
@@ -13,15 +14,20 @@ class TestDonateEndpoint:
         assert data["value"] == 10.0
         assert "id" in data
 
+    @pytest.mark.asyncio
     async def test_get_balance_with_donations(self, client):
         # seed a donation
         await client.post(
             "/donate",
             json={"name": "Bob", "value": 25.0, "date": datetime.now().isoformat()},
         )
+        await client.post(
+            "/donate",
+            json={"name": "Twizufr", "value": 25.0, "date": datetime.now().isoformat()},
+        )
         resp = await client.get("/balance")
         assert resp.status_code == 200
-        assert resp.json()["total"] == 25.0
+        assert resp.json()["total"] == 50.0
 
     async def test_get_empty_balance_returns_500(self, client):
         resp = await client.get("/balance")

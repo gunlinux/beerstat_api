@@ -17,9 +17,11 @@ async def get_db_connection(
     A dependency that provides a connection from the pool.
     It accesses the pool from the application state.
     """
+    print("forbiden")
     db_pool = request.app.state.db_pool
 
     async with db_pool.connection() as conn:
+        print("yield conn")
         yield conn
 
 

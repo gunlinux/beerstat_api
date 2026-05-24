@@ -22,6 +22,7 @@ class WidgetRepo:
         )
         if result := await cursor.fetchone():
             await self.connection.commit()
+            await cursor.close()
             return WidgetDTO(
                 id=result[0],
                 name=result[1],
