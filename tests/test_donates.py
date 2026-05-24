@@ -1,0 +1,51 @@
+from datetime import datetime
+
+import pytest
+
+from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
+from beerstat.domain.exceptions import DomainError
+from beerstat.repo.donates import DonateRepo
+from beerstat.usecases.donates import CreateDonate, GetBalance
+
+
+class TestCreateDonate:
+    async def test_create_donate_returns_dto_with_id(self, db_connection):
+        repo = DonateRepo(connection=db_connection)
+        use_case = CreateDonate(repo=repo)
+        donate = DonateDTO(name="Alice", value=10.0, date=datetime.now())
+
+        result = await use_case.execute(donate)
+
+        assert isinstance(result, DonateDTO)
+        assert result.id is not None
+        assert result.name == "Alice"
+        assert result.value == 10.0
+
+    async def test_anonym_name_default(self, db_connection):
+        repo = DonateRepo(connection=db_connection)
+        use_case = CreateDonate(repo=repo)
+        donate = DonateDTO(name="", value=5.0, date=datetime.now())
+
+        result = await use_case.execute(donate)
+
+        assert result.name == "Anonym"
+
+
+class TestGetBalance:
+    async def test_balance_with_donations(self, db_connection):
+        repo = DonateRepo(connection=db_connection)
+        await repo.add_balance(name="Alice", value=10.0, date=datetime.now())
+        await repo.add_balance(name="Bob", value=20.0, date=datetime.now())
+
+        use_case = GetBalance(repo=repo)
+        result = await use_case.execute()
+
+        assert isinstance(result, DonateBalanceDTO)
+        assert result.total == 30.0
+
+    async def test_empty_balance_raises_domain_error(self, db_connection):
+        repo = DonateRepo(connection=db_connection)
+        use_case = GetBalance(repo=repo)
+
+        with pytest.raises(DomainError):
+            await use_case.execute()

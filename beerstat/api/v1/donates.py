@@ -1,9 +1,8 @@
 from dataclasses import asdict
 
-import aiosqlite
 from fastapi import APIRouter, Depends, HTTPException
 
-from beerstat.api.deps import get_db_connection
+from beerstat.api.deps import get_donate_repo
 from beerstat.domain.exceptions import DomainError
 from beerstat.repo.donates import DonateRepo
 from beerstat.models import Donate, DonateBalance
@@ -17,11 +16,11 @@ donates_router = APIRouter()
 @donates_router.post("/donate", status_code=201)
 async def donate(
     donate_data: Donate,
-    db_conn: aiosqlite.Connection = Depends(get_db_connection),
+    donate_repo: DonateRepo = Depends(get_donate_repo),
 ) -> Donate:
     return Donate(
         **asdict(
-            await CreateDonate(repo=DonateRepo(connection=db_conn)).execute(
+            await CreateDonate(repo=donate_repo).execute(
                 DonateDTO(
                     name=donate_data.name,
                     date=donate_data.date,
@@ -34,11 +33,9 @@ async def donate(
 
 @donates_router.get("/balance")
 async def get_donations(
-    db_conn: aiosqlite.Connection = Depends(get_db_connection),
+    donate_repo: DonateRepo = Depends(get_donate_repo),
 ) -> DonateBalance:
     try:
-        return DonateBalance(
-            **asdict(await GetBalance(repo=DonateRepo(connection=db_conn)).execute())
-        )
+        return DonateBalance(**asdict(await GetBalance(repo=donate_repo).execute()))
     except DomainError:
         raise HTTPException(status_code=500)

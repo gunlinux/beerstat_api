@@ -7,6 +7,7 @@ class Donate(BaseModel):
     name: str
     value: float
     date: datetime
+    id: int | None = None
 
 
 class DonateBalance(BaseModel):
@@ -18,7 +19,6 @@ class Widget(BaseModel):
     timeout: int
     showtime: int
     template: str
-    sleep: int | None = None
     id: int | None = None
 
 

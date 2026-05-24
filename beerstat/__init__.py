@@ -9,6 +9,7 @@ from beerstat.api.v1.widgets import widgets_router
 from beerstat.api.v1.widgets_page import widgets_page
 from beerstat.api.deps import sqlite_connection
 from beerstat.settings import Settings
+from beerstat.repo.factory import RepoFactory
 
 
 app_settings = Settings.model_validate({})
@@ -29,6 +30,8 @@ async def lifespan(app: FastAPI):
         pool_size=10,
     )  # pyright: ignore[reportArgumentType]
     app.state.db_pool = db_pool
+    app.state.settings = app_settings
+    app.state.repo_factory = RepoFactory()
     yield
     await db_pool.close()
 

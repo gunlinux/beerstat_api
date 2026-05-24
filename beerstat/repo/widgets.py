@@ -22,6 +22,7 @@ class WidgetRepo:
         )
         if result := await cursor.fetchone():
             await self.connection.commit()
+            await cursor.close()
             return WidgetDTO(
                 id=result[0],
                 name=result[1],
@@ -46,18 +47,6 @@ class WidgetRepo:
                 showtime=result[3],
                 template=result[4],
             )
-        raise RepoError
-
-    async def get_stat(self) -> tuple[int, int]:
-        cursor = await self.connection.execute(
-            """
-                SELECT sum(showtime), count(id) FROM widgets
-            """
-        )
-        if result := await cursor.fetchone():
-            showtime, count = result
-            if showtime is not None and count is not None:
-                return (showtime, count)
         raise RepoError
 
     async def get_all(self) -> list[WidgetDTO]:
