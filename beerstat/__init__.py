@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from collections.abc import Awaitable, Callable
 
 import aiosqlite
 from aiosqlitepool import SQLiteConnectionPool
@@ -14,11 +15,13 @@ from beerstat.settings import Settings
 from beerstat.repo.factory import RepoFactory
 
 
-app_settings = Settings.model_validate({})
+def make_connection_factory(
+    settings: Settings,
+) -> Callable[[], Awaitable[aiosqlite.Connection]]:
+    async def factory() -> aiosqlite.Connection:
+        return await sqlite_connection(settings.sqlite_uri)
 
-
-async def sql_setup_connection() -> aiosqlite.Connection:
-    return await sqlite_connection(app_settings.sqlite_uri)
+    return factory
 
 
 @asynccontextmanager
@@ -27,12 +30,13 @@ async def lifespan(app: FastAPI):
     Manage the connection pool's lifecycle.
     The pool is created when the application starts and gracefully closed when it stops.
     """
+    settings = Settings.model_validate({})
     db_pool = SQLiteConnectionPool(
-        connection_factory=sql_setup_connection,  # pyright: ignore[reportArgumentType]
+        connection_factory=make_connection_factory(settings),  # pyright: ignore[reportArgumentType]
         pool_size=10,
     )  # pyright: ignore[reportArgumentType]
     app.state.db_pool = db_pool
-    app.state.settings = app_settings
+    app.state.settings = settings
     app.state.repo_factory = RepoFactory()
     yield
     await db_pool.close()

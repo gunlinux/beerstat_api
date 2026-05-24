@@ -1,16 +1,14 @@
 import os
-from collections.abc import Callable, Awaitable
 from random import randint
 
 import pytest_asyncio
 
 from aiosqlitepool import SQLiteConnectionPool
-import aiosqlite
 from httpx import ASGITransport, AsyncClient
 from beerstat.repo.factory import RepoFactory
 from beerstat.api.deps import sqlite_connection
 
-from beerstat import create_app
+from beerstat import create_app, make_connection_factory
 from beerstat.settings import Settings
 
 
@@ -54,19 +52,11 @@ async def client():
 
     app_settings = get_app_settings()
 
-    def sql_setup_connection(uri: str) -> Callable[[], Awaitable[aiosqlite.Connection]]:
-        async def inner() -> aiosqlite.Connection:
-            return await sqlite_connection(uri)
-
-        return inner
-
     @asynccontextmanager
     async def test_lifespan(app):
-        app.state.settings = app_settings
         migrate(app_settings.sqlite_uri)
-        f = sql_setup_connection(app_settings.sqlite_uri)
         db_pool = SQLiteConnectionPool(
-            connection_factory=f,  # pyright: ignore[reportArgumentType]
+            connection_factory=make_connection_factory(app_settings),  # pyright: ignore[reportArgumentType]
             pool_size=10,
         )  # pyright: ignore[reportArgumentType]
         app.state.db_pool = db_pool
