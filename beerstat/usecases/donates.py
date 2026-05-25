@@ -1,9 +1,10 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 from beerstat.domain.exceptions import DomainError, DonateNotFoundError
 from beerstat.domain.ports import DonateRepoPort
 from beerstat.infrastructure.exceptions import RepoError
-from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
+from beerstat.domain.donate import DonateDTO, DonateBalanceDTO, DonatorSummaryDTO
 
 
 @dataclass
@@ -91,3 +92,16 @@ class DeleteDonate:
             await self.repo.delete(donate_id=donate_id)
         except RepoError:
             raise DonateNotFoundError
+
+
+@dataclass
+class GetTopDonators:
+    repo: DonateRepoPort
+
+    async def execute(
+        self, limit: int = 5, since: datetime | None = None
+    ) -> list[DonatorSummaryDTO]:
+        try:
+            return await self.repo.get_top(limit=limit, since=since)
+        except RepoError:
+            raise DomainError

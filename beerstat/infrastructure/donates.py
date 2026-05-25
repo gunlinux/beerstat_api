@@ -2,7 +2,7 @@ from datetime import datetime
 
 from aiosqlite import Connection
 
-from beerstat.domain.donate import DonateDTO
+from beerstat.domain.donate import DonateDTO, DonatorSummaryDTO
 from beerstat.infrastructure.exceptions import RepoError
 
 
@@ -83,3 +83,24 @@ class DonateRepo:
         ) as cursor:
             if cursor.rowcount == 0:
                 raise RepoError
+
+    async def get_top(
+        self, limit: int, since: datetime | None = None
+    ) -> list[DonatorSummaryDTO]:
+        if since is not None:
+            sql = (
+                "SELECT name, SUM(value) as total FROM donations "
+                "WHERE value > 0 AND date >= ? "
+                "GROUP BY name ORDER BY total DESC LIMIT ?"
+            )
+            params: tuple = (since, limit)
+        else:
+            sql = (
+                "SELECT name, SUM(value) as total FROM donations "
+                "WHERE value > 0 "
+                "GROUP BY name ORDER BY total DESC LIMIT ?"
+            )
+            params = (limit,)
+        async with await self.connection.execute(sql, params) as cursor:
+            rows = await cursor.fetchall()
+        return [DonatorSummaryDTO(name=r[0], total=r[1]) for r in rows]

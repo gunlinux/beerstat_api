@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Protocol
 
-from beerstat.domain.donate import DonateDTO
+from beerstat.domain.donate import DonateDTO, DonatorSummaryDTO
 from beerstat.domain.widget import WidgetDTO
 
 
@@ -25,6 +25,10 @@ class DonateRepoPort(Protocol):
     ) -> DonateDTO: ...
 
     async def delete(self, donate_id: int) -> None: ...
+
+    async def get_top(
+        self, limit: int, since: datetime | None = None
+    ) -> list[DonatorSummaryDTO]: ...
 
 
 class WidgetRepoPort(Protocol):

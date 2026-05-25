@@ -1,0 +1,10 @@
+<ol class="donators-list">
+  {% for d in donators %}
+  <li class="donator-item">
+    <span class="donator-name">{{ d.name }}</span>
+    <span class="donator-total">{{ "%.2f"|format(d.total) }} €</span>
+  </li>
+  {% else %}
+  <li class="donator-empty">No donations yet.</li>
+  {% endfor %}
+</ol>

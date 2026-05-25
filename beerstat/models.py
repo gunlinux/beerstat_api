@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
-    from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
+    from beerstat.domain.donate import DonateDTO, DonateBalanceDTO, DonatorSummaryDTO
     from beerstat.domain.widget import WidgetDTO
 
 
@@ -72,6 +72,19 @@ class WidgetOut(BaseModel):
 
 class DonationsOut(BaseModel):
     donations: list[DonateOut]
+
+
+class TopDonatorOut(BaseModel):
+    name: str
+    total: float
+
+    @classmethod
+    def from_dto(cls, dto: DonatorSummaryDTO) -> TopDonatorOut:
+        return cls(name=dto.name, total=dto.total)
+
+
+class TopDonatorsOut(BaseModel):
+    donators: list[TopDonatorOut]
 
 
 class WidgetStat(BaseModel):

@@ -16,3 +16,9 @@ class DonateDTO:
 @dataclass(frozen=True)
 class DonateBalanceDTO:
     total: float
+
+
+@dataclass(frozen=True)
+class DonatorSummaryDTO:
+    name: str
+    total: float
