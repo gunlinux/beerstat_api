@@ -32,7 +32,7 @@ class DonateRepo:
 
     async def get_last(self, limit: int) -> list[DonateDTO]:
         async with await self.connection.execute(
-            "SELECT id, name, date, value FROM donations ORDER BY date DESC LIMIT ?",
+            "SELECT id, name, date, value FROM donations WHERE value > 0 ORDER BY date DESC LIMIT ?",
             (limit,),
         ) as cursor:
             rows = await cursor.fetchall()

@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from beerstat.infrastructure.donates import DonateRepo
+
 
 class TestGetLastDonations:
     async def test_returns_empty_list_when_no_donations(self, client):
@@ -32,18 +34,14 @@ class TestGetLastDonations:
             json={"name": "Alice", "value": 5.0, "date": datetime.now().isoformat()},
         )
 
-        resp = await client.get(
-            "/donations/last", headers={"HX-Request": "true"}
-        )
+        resp = await client.get("/donations/last", headers={"HX-Request": "true"})
         assert resp.status_code == 200
         assert "text/html" in resp.headers["content-type"]
         assert "Alice" in resp.text
         assert "5.0" in resp.text
 
     async def test_htmx_fragment_shows_empty_state(self, client):
-        resp = await client.get(
-            "/donations/last", headers={"HX-Request": "true"}
-        )
+        resp = await client.get("/donations/last", headers={"HX-Request": "true"})
         assert resp.status_code == 200
         assert "text/html" in resp.headers["content-type"]
         assert "No donations yet." in resp.text
@@ -54,3 +52,14 @@ class TestGetLastDonations:
         assert "text/html" in resp.headers["content-type"]
         assert "Last 10 donations" in resp.text
         assert 'hx-get="/donations/last"' in resp.text
+
+    async def test_negative_value_donations_excluded(self, db_connection):
+        repo = DonateRepo(db_connection)
+        await repo.add_balance("NegativeDonor", -5.0, datetime(2024, 1, 1))
+        await repo.add_balance("PositiveDonor", 10.0, datetime(2024, 1, 2))
+
+        result = await repo.get_last(10)
+
+        names = [d.name for d in result]
+        assert "PositiveDonor" in names
+        assert "NegativeDonor" not in names
