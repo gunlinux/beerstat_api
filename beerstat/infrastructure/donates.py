@@ -10,15 +10,21 @@ class DonateRepo:
     def __init__(self, connection: Connection) -> None:
         self.connection = connection
 
-    async def add_balance(self, name: str, value: float, date: datetime) -> DonateDTO:
+    async def add_balance(
+        self, name: str, value: float, date: datetime, commentary: str | None = None
+    ) -> DonateDTO:
         cursor = await self.connection.execute(
-            "INSERT INTO donations (name, value, date) VALUES (?, ?, ?) RETURNING id, name, date, value",
-            (name, value, date),
+            "INSERT INTO donations (name, value, date, commentary) VALUES (?, ?, ?, ?) RETURNING id, name, date, value, commentary",
+            (name, value, date, commentary),
         )
         async with cursor:
             if result := await cursor.fetchone():
                 return DonateDTO(
-                    id=result[0], name=result[1], date=result[2], value=result[3]
+                    id=result[0],
+                    name=result[1],
+                    date=result[2],
+                    value=result[3],
+                    commentary=result[4],
                 )
         raise RepoError
 
@@ -32,11 +38,14 @@ class DonateRepo:
 
     async def get_last(self, limit: int) -> list[DonateDTO]:
         async with await self.connection.execute(
-            "SELECT id, name, date, value FROM donations WHERE value > 0 ORDER BY date DESC LIMIT ?",
+            "SELECT id, name, date, value, commentary FROM donations WHERE value > 0 ORDER BY date DESC LIMIT ?",
             (limit,),
         ) as cursor:
             rows = await cursor.fetchall()
-        return [DonateDTO(id=r[0], name=r[1], date=r[2], value=r[3]) for r in rows]
+        return [
+            DonateDTO(id=r[0], name=r[1], date=r[2], value=r[3], commentary=r[4])
+            for r in rows
+        ]
 
     async def count(self) -> int:
         async with await self.connection.execute(
@@ -47,32 +56,46 @@ class DonateRepo:
 
     async def get_page(self, offset: int, limit: int) -> list[DonateDTO]:
         async with await self.connection.execute(
-            "SELECT id, name, date, value FROM donations ORDER BY id DESC LIMIT ? OFFSET ?",
+            "SELECT id, name, date, value, commentary FROM donations ORDER BY id DESC LIMIT ? OFFSET ?",
             (limit, offset),
         ) as cursor:
             rows = await cursor.fetchall()
-        return [DonateDTO(id=r[0], name=r[1], date=r[2], value=r[3]) for r in rows]
+        return [
+            DonateDTO(id=r[0], name=r[1], date=r[2], value=r[3], commentary=r[4])
+            for r in rows
+        ]
 
     async def get_by_id(self, donate_id: int) -> DonateDTO:
         async with await self.connection.execute(
-            "SELECT id, name, date, value FROM donations WHERE id = ?",
+            "SELECT id, name, date, value, commentary FROM donations WHERE id = ?",
             (donate_id,),
         ) as cursor:
             row = await cursor.fetchone()
         if row is None:
             raise RepoError
-        return DonateDTO(id=row[0], name=row[1], date=row[2], value=row[3])
+        return DonateDTO(
+            id=row[0], name=row[1], date=row[2], value=row[3], commentary=row[4]
+        )
 
     async def update(
-        self, donate_id: int, name: str, value: float, date: datetime
+        self,
+        donate_id: int,
+        name: str,
+        value: float,
+        date: datetime,
+        commentary: str | None = None,
     ) -> DonateDTO:
         async with await self.connection.execute(
-            "UPDATE donations SET name=?, value=?, date=? WHERE id=? RETURNING id, name, date, value",
-            (name, value, date, donate_id),
+            "UPDATE donations SET name=?, value=?, date=?, commentary=? WHERE id=? RETURNING id, name, date, value, commentary",
+            (name, value, date, commentary, donate_id),
         ) as cursor:
             if result := await cursor.fetchone():
                 return DonateDTO(
-                    id=result[0], name=result[1], date=result[2], value=result[3]
+                    id=result[0],
+                    name=result[1],
+                    date=result[2],
+                    value=result[3],
+                    commentary=result[4],
                 )
         raise RepoError
 

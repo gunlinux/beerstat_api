@@ -125,10 +125,16 @@ async def admin_donation_create(
     name: str = Form(default=""),
     value: float = Form(...),
     date: str = Form(...),
+    commentary: str | None = Form(default=None),
     donate_repo: DonateRepo = Depends(get_donate_repo),
 ):
     await CreateDonate(repo=donate_repo).execute(
-        DonateDTO(name=name, value=value, date=datetime.fromisoformat(date))
+        DonateDTO(
+            name=name,
+            value=value,
+            date=datetime.fromisoformat(date),
+            commentary=commentary or None,
+        )
     )
     return RedirectResponse(url="/admin/donations/", status_code=303)
 
@@ -173,11 +179,17 @@ async def admin_donation_update(
     name: str = Form(...),
     value: float = Form(...),
     date: str = Form(...),
+    commentary: str | None = Form(default=None),
     donate_repo: DonateRepo = Depends(get_donate_repo),
 ):
     await UpdateDonate(repo=donate_repo).execute(
         donate_id=donate_id,
-        donate=DonateDTO(name=name, value=value, date=datetime.fromisoformat(date)),
+        donate=DonateDTO(
+            name=name,
+            value=value,
+            date=datetime.fromisoformat(date),
+            commentary=commentary or None,
+        ),
     )
     return RedirectResponse(url="/admin/donations/", status_code=303)
 

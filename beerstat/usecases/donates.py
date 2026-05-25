@@ -17,6 +17,7 @@ class CreateDonate:
                 name=donate.name,
                 value=donate.value,
                 date=donate.date,
+                commentary=donate.commentary,
             )
         except RepoError:
             raise DomainError
@@ -78,6 +79,7 @@ class UpdateDonate:
                 name=donate.name,
                 value=donate.value,
                 date=donate.date,
+                commentary=donate.commentary,
             )
         except RepoError:
             raise DonateNotFoundError

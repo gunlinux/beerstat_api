@@ -8,6 +8,7 @@ class DonateDTO:
     value: float
     date: datetime
     id: int | None = None
+    commentary: str | None = None
 
     def __post_init__(self):
         object.__setattr__(self, "name", self.name or "Anonym")

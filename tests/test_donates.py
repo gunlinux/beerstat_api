@@ -30,6 +30,26 @@ class TestCreateDonate:
 
         assert result.name == "Anonym"
 
+    async def test_create_with_commentary(self, db_connection):
+        repo = DonateRepo(connection=db_connection)
+        use_case = CreateDonate(repo=repo)
+        donate = DonateDTO(
+            name="Alice", value=10.0, date=datetime.now(), commentary="keep it up!"
+        )
+
+        result = await use_case.execute(donate)
+
+        assert result.commentary == "keep it up!"
+
+    async def test_create_without_commentary_defaults_to_none(self, db_connection):
+        repo = DonateRepo(connection=db_connection)
+        use_case = CreateDonate(repo=repo)
+        donate = DonateDTO(name="Bob", value=5.0, date=datetime.now())
+
+        result = await use_case.execute(donate)
+
+        assert result.commentary is None
+
 
 class TestGetBalance:
     async def test_balance_with_donations(self, db_connection):

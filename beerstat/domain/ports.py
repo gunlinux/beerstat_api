@@ -7,7 +7,7 @@ from beerstat.domain.widget import WidgetDTO
 
 class DonateRepoPort(Protocol):
     async def add_balance(
-        self, name: str, value: float, date: datetime
+        self, name: str, value: float, date: datetime, commentary: str | None = None
     ) -> DonateDTO: ...
 
     async def get_balance(self) -> float | None: ...
@@ -21,7 +21,12 @@ class DonateRepoPort(Protocol):
     async def get_by_id(self, donate_id: int) -> DonateDTO: ...
 
     async def update(
-        self, donate_id: int, name: str, value: float, date: datetime
+        self,
+        donate_id: int,
+        name: str,
+        value: float,
+        date: datetime,
+        commentary: str | None = None,
     ) -> DonateDTO: ...
 
     async def delete(self, donate_id: int) -> None: ...
