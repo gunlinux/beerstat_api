@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin">
+  <h1>Widgets</h1>
+  <a href="/admin/widget/new">+ New Widget</a>
+  <ul id="widget-list">
+    {% for widget in widgets %}
+    <li id="widget-{{ widget.id }}">
+      <a href="/admin/widget/{{ widget.id }}/edit">{{ widget.name }}</a>
+      <button hx-delete="/admin/widget/{{ widget.id }}"
+              hx-target="#widget-{{ widget.id }}"
+              hx-swap="delete"
+              hx-confirm="Delete '{{ widget.name }}'?">Delete</button>
+    </li>
+    {% else %}
+    <li>No widgets.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

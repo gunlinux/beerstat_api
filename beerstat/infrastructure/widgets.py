@@ -41,6 +41,31 @@ class WidgetRepo:
                 )
         raise RepoError
 
+    async def update(
+        self, widget_id: int, name: str, timeout: int, showtime: int, template: str
+    ) -> WidgetDTO:
+        async with await self.connection.execute(
+            "UPDATE widgets SET name=?, timeout=?, showtime=?, template=? WHERE id=? RETURNING id, name, timeout, showtime, template",
+            (name, timeout, showtime, template, widget_id),
+        ) as cursor:
+            if result := await cursor.fetchone():
+                return WidgetDTO(
+                    id=result[0],
+                    name=result[1],
+                    timeout=result[2],
+                    showtime=result[3],
+                    template=result[4],
+                )
+        raise RepoError
+
+    async def delete(self, widget_id: int) -> None:
+        async with await self.connection.execute(
+            "DELETE FROM widgets WHERE id=?",
+            (widget_id,),
+        ) as cursor:
+            if cursor.rowcount == 0:
+                raise RepoError
+
     async def get_all(self) -> list[WidgetDTO]:
         async with await self.connection.execute(
             "SELECT id, name, timeout, showtime, template FROM widgets"

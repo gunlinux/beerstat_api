@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin">
+  <h2>Edit: {{ widget.name }}</h2>
+  <form method="post" action="/admin/widget/{{ widget.id }}/edit">
+    <label>Name<input name="name" value="{{ widget.name }}" required></label>
+    <label>Timeout (s)<input name="timeout" type="number" value="{{ widget.timeout }}" min="1" required></label>
+    <label>Showtime (s)<input name="showtime" type="number" value="{{ widget.showtime }}" min="1" required></label>
+    <label>Template<textarea name="template" required>{{ widget.template }}</textarea></label>
+    <button type="submit">Save</button>
+    <a href="/admin/">Cancel</a>
+  </form>
+</div>
+{% endblock %}

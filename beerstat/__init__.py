@@ -4,6 +4,7 @@ from aiosqlitepool import SQLiteConnectionPool
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from beerstat.api.v1.admin import admin_router
 from beerstat.api.v1.donates import donates_router
 from beerstat.api.v1.widgets import widgets_router
 from beerstat.api.v1.widgets_page import widgets_page
@@ -48,6 +49,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(donates_router)
     app.include_router(widgets_router, prefix="/widget")
     app.include_router(widgets_page, prefix="/page")
+    app.include_router(admin_router, prefix="/admin")
     app.mount("/static", StaticFiles(directory="static"), name="static")
     return app
 
