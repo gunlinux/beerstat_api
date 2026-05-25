@@ -1,10 +1,25 @@
-<ul class="donations-list">
-  {% for d in donations %}
-  <li class="donation-item">
-    <span class="donation-name">{{ d.name }}</span>
-    <span class="donation-value">{{ d.value }} €</span>
-  </li>
-  {% else %}
-  <li class="donation-empty">No donations yet.</li>
-  {% endfor %}
-</ul>
+<table class="simple bordered">
+  <thead>
+    <tr>
+      <th>Donator</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in donations %}
+      <tr class="donation-item">
+        <td class="donation-name">{{ d.name }}</td>
+        <td class="donation-value">{{ d.value }} ₽</td>
+      </tr>
+      {% else %}
+      <tr class="donation-empty"><td>No donations yet.</td></tr>
+      {% endfor %}
+
+      <!-- tr and td tags-->
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2"></td>
+    </tr>
+  </tfoot>
+</table>

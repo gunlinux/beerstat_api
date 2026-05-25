@@ -2,10 +2,9 @@
 
 {% block content %}
 <article class="widget" id="donations-widget">
-  <h2>Last 10 donations</h2>
   <div id="donations-list"
        hx-get="/donations/last"
-       hx-trigger="load, every 10s"
+       hx-trigger="load"
        hx-swap="innerHTML">
     <p>Loading&hellip;</p>
   </div>

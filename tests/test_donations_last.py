@@ -50,7 +50,6 @@ class TestGetLastDonations:
         resp = await client.get("/page/donations")
         assert resp.status_code == 200
         assert "text/html" in resp.headers["content-type"]
-        assert "Last 10 donations" in resp.text
         assert 'hx-get="/donations/last"' in resp.text
 
     async def test_negative_value_donations_excluded(self, db_connection):
