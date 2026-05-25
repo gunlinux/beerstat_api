@@ -1,15 +1,50 @@
-{% extends "base.html" %}
+{% extends "admin/admin_base.html" %}
+
+{% block title %}New Widget — BeerStat Admin{% endblock %}
 
 {% block content %}
-<div class="admin">
-  <h2>New Widget</h2>
-  <form method="post" action="/admin/widget/new">
-    <label>Name<input name="name" required></label>
-    <label>Timeout (s)<input name="timeout" type="number" min="1" required></label>
-    <label>Showtime (s)<input name="showtime" type="number" value="{{ default_showtime }}" min="1" required></label>
-    <label>Template<textarea name="template" required></textarea></label>
-    <button type="submit">Create</button>
-    <a href="/admin/">Cancel</a>
-  </form>
+<div class="row justify-content-center">
+  <div class="col-lg-7 col-md-9">
+    <div class="mb-3">
+      <a href="/admin/" class="text-secondary text-decoration-none small">
+        <i class="bi bi-arrow-left me-1"></i>Back to Widgets
+      </a>
+    </div>
+    <div class="card border-secondary">
+      <div class="card-header border-secondary">
+        <h5 class="card-title mb-0">New Widget</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" action="/admin/widget/new">
+          <div class="mb-3">
+            <label class="form-label text-secondary">Name</label>
+            <input class="form-control" name="name" required>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label class="form-label text-secondary">Timeout (s)</label>
+              <input class="form-control" name="timeout" type="number" min="1" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary">Showtime (s)</label>
+              <input class="form-control" name="showtime" type="number"
+                     value="{{ default_showtime }}" min="1" required>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label text-secondary">Template</label>
+            <textarea class="form-control font-monospace" name="template"
+                      rows="12" required></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-plus-lg me-1"></i>Create
+            </button>
+            <a href="/admin/" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

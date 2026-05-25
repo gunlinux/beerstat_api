@@ -1,15 +1,51 @@
-{% extends "base.html" %}
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Edit {{ widget.name }} — BeerStat Admin{% endblock %}
 
 {% block content %}
-<div class="admin">
-  <h2>Edit: {{ widget.name }}</h2>
-  <form method="post" action="/admin/widget/{{ widget.id }}/edit">
-    <label>Name<input name="name" value="{{ widget.name }}" required></label>
-    <label>Timeout (s)<input name="timeout" type="number" value="{{ widget.timeout }}" min="1" required></label>
-    <label>Showtime (s)<input name="showtime" type="number" value="{{ widget.showtime }}" min="1" required></label>
-    <label>Template<textarea name="template" required>{{ widget.template }}</textarea></label>
-    <button type="submit">Save</button>
-    <a href="/admin/">Cancel</a>
-  </form>
+<div class="row justify-content-center">
+  <div class="col-lg-7 col-md-9">
+    <div class="mb-3">
+      <a href="/admin/" class="text-secondary text-decoration-none small">
+        <i class="bi bi-arrow-left me-1"></i>Back to Widgets
+      </a>
+    </div>
+    <div class="card border-secondary">
+      <div class="card-header border-secondary">
+        <h5 class="card-title mb-0">Edit: {{ widget.name }}</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" action="/admin/widget/{{ widget.id }}/edit">
+          <div class="mb-3">
+            <label class="form-label text-secondary">Name</label>
+            <input class="form-control" name="name" value="{{ widget.name }}" required>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label class="form-label text-secondary">Timeout (s)</label>
+              <input class="form-control" name="timeout" type="number"
+                     value="{{ widget.timeout }}" min="1" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary">Showtime (s)</label>
+              <input class="form-control" name="showtime" type="number"
+                     value="{{ widget.showtime }}" min="1" required>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label text-secondary">Template</label>
+            <textarea class="form-control font-monospace" name="template"
+                      rows="12" required>{{ widget.template }}</textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>Save
+            </button>
+            <a href="/admin/" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
