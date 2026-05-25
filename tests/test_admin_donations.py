@@ -89,6 +89,32 @@ class TestDonateRepoUpdate:
         assert updated.name == "Changed"
         assert updated.value == 99.9
 
+    async def test_update_with_commentary(self, db_connection):
+        repo = DonateRepo(db_connection)
+        created = (await _seed(repo, 1))[0]
+        updated = await repo.update(
+            donate_id=cast(int, created.id),
+            name=created.name,
+            value=created.value,
+            date=created.date,
+            commentary="added note",
+        )
+        assert updated.commentary == "added note"
+
+    async def test_update_clears_commentary(self, db_connection):
+        repo = DonateRepo(db_connection)
+        created = await repo.add_balance(
+            name="X", value=1.0, date=datetime.now(), commentary="old"
+        )
+        updated = await repo.update(
+            donate_id=cast(int, created.id),
+            name=created.name,
+            value=created.value,
+            date=created.date,
+            commentary=None,
+        )
+        assert updated.commentary is None
+
     async def test_update_missing_raises(self, db_connection):
         repo = DonateRepo(db_connection)
         with pytest.raises(RepoError):

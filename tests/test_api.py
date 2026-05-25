@@ -13,6 +13,28 @@ class TestDonateEndpoint:
         assert data["value"] == 10.0
         assert "id" in data
 
+    async def test_post_donate_with_commentary(self, client):
+        resp = await client.post(
+            "/donate",
+            json={
+                "name": "Alice",
+                "value": 10.0,
+                "date": datetime.now().isoformat(),
+                "commentary": "great stream!",
+            },
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["commentary"] == "great stream!"
+
+    async def test_post_donate_without_commentary_returns_null(self, client):
+        resp = await client.post(
+            "/donate",
+            json={"name": "Bob", "value": 5.0, "date": datetime.now().isoformat()},
+        )
+        assert resp.status_code == 201
+        assert resp.json()["commentary"] is None
+
     async def test_get_balance_with_donations(self, client):
         # seed a donation
         await client.post(

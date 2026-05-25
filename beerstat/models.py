@@ -15,11 +15,17 @@ class DonateCreateIn(BaseModel):
     name: str
     value: float = Field(gt=0)
     date: datetime
+    commentary: str | None = None
 
     def to_dto(self) -> DonateDTO:
         from beerstat.domain.donate import DonateDTO
 
-        return DonateDTO(name=self.name, value=self.value, date=self.date)
+        return DonateDTO(
+            name=self.name,
+            value=self.value,
+            date=self.date,
+            commentary=self.commentary,
+        )
 
 
 class DonateOut(BaseModel):
@@ -27,6 +33,7 @@ class DonateOut(BaseModel):
     name: str
     value: float
     date: datetime
+    commentary: str | None = None
 
     @classmethod
     def from_dto(cls, dto: DonateDTO) -> DonateOut:
