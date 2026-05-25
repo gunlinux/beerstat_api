@@ -12,6 +12,7 @@ from beerstat.infrastructure.widgets import WidgetRepo
 from beerstat.models import DonateOut, WidgetOut
 from beerstat.settings import Settings
 from beerstat.usecases.donates import (
+    CreateDonate,
     DeleteDonate,
     GetDonate,
     GetDonationsPage,
@@ -109,6 +110,27 @@ async def admin_widget_delete(
 
 
 # --- Donation routes ---
+
+
+@admin_router.get("/donations/new")
+async def admin_donation_new(request: Request):
+    now = datetime.now().strftime("%Y-%m-%dT%H:%M")
+    return templates.TemplateResponse(
+        request, "admin/donation_create.html", {"now": now}
+    )
+
+
+@admin_router.post("/donations/new")
+async def admin_donation_create(
+    name: str = Form(default=""),
+    value: float = Form(...),
+    date: str = Form(...),
+    donate_repo: DonateRepo = Depends(get_donate_repo),
+):
+    await CreateDonate(repo=donate_repo).execute(
+        DonateDTO(name=name, value=value, date=datetime.fromisoformat(date))
+    )
+    return RedirectResponse(url="/admin/donations/", status_code=303)
 
 
 @admin_router.get("/donations/")
