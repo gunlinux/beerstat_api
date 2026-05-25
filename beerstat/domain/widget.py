@@ -8,3 +8,4 @@ class WidgetDTO:
     showtime: int
     template: str
     id: int | None = None
+    order: int = 0

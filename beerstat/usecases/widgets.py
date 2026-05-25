@@ -17,6 +17,7 @@ class CreateWidget:
                 timeout=widget.timeout,
                 showtime=widget.showtime,
                 template=widget.template,
+                order=widget.order,
             )
         except RepoError:
             raise CreateError
@@ -56,6 +57,7 @@ class UpdateWidget:
                 timeout=widget.timeout,
                 showtime=widget.showtime,
                 template=widget.template,
+                order=widget.order,
             )
         except RepoError:
             raise WidgetNotFoundError

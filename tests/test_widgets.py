@@ -10,6 +10,7 @@ from beerstat.usecases.widgets import (
     CreateWidget,
     GetWidget,
     GetWidgets,
+    UpdateWidget,
 )
 
 
@@ -27,6 +28,20 @@ class TestCreateWidget:
         assert result.timeout == 5
         assert result.showtime == 3
         assert result.template == "<div/>"
+
+    async def test_create_widget_default_order_is_zero(self, db_connection):
+        repo = WidgetRepo(connection=db_connection)
+        result = await CreateWidget(repo=repo).execute(
+            WidgetDTO(name="w", timeout=1, showtime=1, template="<w/>")
+        )
+        assert result.order == 0
+
+    async def test_create_widget_preserves_order(self, db_connection):
+        repo = WidgetRepo(connection=db_connection)
+        result = await CreateWidget(repo=repo).execute(
+            WidgetDTO(name="w", timeout=1, showtime=1, template="<w/>", order=5)
+        )
+        assert result.order == 5
 
 
 class TestGetWidget:
@@ -73,6 +88,20 @@ class TestGetWidgets:
         assert "w1" in names
         assert "w2" in names
 
+    async def test_get_all_ordered_by_order_then_id(self, db_connection):
+        repo = WidgetRepo(connection=db_connection)
+        w_b = await repo.add(name="b", timeout=1, showtime=1, template="<b/>", order=2)
+        w_a = await repo.add(name="a", timeout=1, showtime=1, template="<a/>", order=1)
+        w_none = await repo.add(
+            name="none", timeout=1, showtime=1, template="<n/>", order=0
+        )
+
+        result = await GetWidgets(repo=repo).execute()
+        # order=0 items (seeded + w_none) come first sorted by id, then order=1, then order=2
+        ordered_ids = [w.id for w in result]
+        assert ordered_ids.index(w_a.id) < ordered_ids.index(w_b.id)
+        assert ordered_ids.index(w_none.id) < ordered_ids.index(w_a.id)
+
     async def test_repo_error_raises_create_error(self):
         mock_repo = AsyncMock()
         mock_repo.get_all.side_effect = RepoError
@@ -80,6 +109,34 @@ class TestGetWidgets:
 
         with pytest.raises(CreateError):
             await use_case.execute()
+
+
+class TestUpdateWidgetOrder:
+    async def test_update_preserves_order(self, db_connection):
+        repo = WidgetRepo(connection=db_connection)
+        created = await repo.add(
+            name="w", timeout=1, showtime=1, template="<w/>", order=3
+        )
+
+        updated = await UpdateWidget(repo=repo).execute(
+            widget_id=cast(int, created.id),
+            widget=WidgetDTO(name="w", timeout=1, showtime=1, template="<w/>", order=7),
+        )
+
+        assert updated.order == 7
+
+    async def test_update_order_to_zero(self, db_connection):
+        repo = WidgetRepo(connection=db_connection)
+        created = await repo.add(
+            name="w", timeout=1, showtime=1, template="<w/>", order=5
+        )
+
+        updated = await UpdateWidget(repo=repo).execute(
+            widget_id=cast(int, created.id),
+            widget=WidgetDTO(name="w", timeout=1, showtime=1, template="<w/>", order=0),
+        )
+
+        assert updated.order == 0
 
 
 class TestCreateWidgetErrors:

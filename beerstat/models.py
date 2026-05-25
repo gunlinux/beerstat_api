@@ -46,6 +46,7 @@ class WidgetCreateIn(BaseModel):
     timeout: int = Field(gt=0)
     showtime: int | None = Field(default=None, gt=0)
     template: str
+    order: int = 0
 
     def to_dto(self, *, showtime_default: int) -> WidgetDTO:
         from beerstat.domain.widget import WidgetDTO
@@ -55,6 +56,7 @@ class WidgetCreateIn(BaseModel):
             timeout=self.timeout,
             showtime=self.showtime if self.showtime is not None else showtime_default,
             template=self.template,
+            order=self.order,
         )
 
 
@@ -64,6 +66,7 @@ class WidgetOut(BaseModel):
     timeout: int
     showtime: int
     template: str
+    order: int = 0
 
     @classmethod
     def from_dto(cls, dto: WidgetDTO) -> WidgetOut:

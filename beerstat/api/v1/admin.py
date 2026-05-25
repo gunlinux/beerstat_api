@@ -62,10 +62,17 @@ async def admin_widget_create(
     timeout: int = Form(...),
     showtime: int = Form(...),
     template: str = Form(...),
+    order: int = Form(default=0),
     widget_repo: WidgetRepo = Depends(get_widget_repo),
 ):
     await CreateWidget(repo=widget_repo).execute(
-        WidgetDTO(name=name, timeout=timeout, showtime=showtime, template=template)
+        WidgetDTO(
+            name=name,
+            timeout=timeout,
+            showtime=showtime,
+            template=template,
+            order=order,
+        )
     )
     return RedirectResponse(url="/admin/", status_code=303)
 
@@ -89,12 +96,17 @@ async def admin_widget_update(
     timeout: int = Form(...),
     showtime: int = Form(...),
     template: str = Form(...),
+    order: int = Form(default=0),
     widget_repo: WidgetRepo = Depends(get_widget_repo),
 ):
     await UpdateWidget(repo=widget_repo).execute(
         widget_id=widget_id,
         widget=WidgetDTO(
-            name=name, timeout=timeout, showtime=showtime, template=template
+            name=name,
+            timeout=timeout,
+            showtime=showtime,
+            template=template,
+            order=order,
         ),
     )
     return RedirectResponse(url="/admin/", status_code=303)
