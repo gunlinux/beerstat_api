@@ -38,7 +38,7 @@ class DonateRepoPort(Protocol):
 
 class WidgetRepoPort(Protocol):
     async def add(
-        self, name: str, timeout: int, showtime: int, template: str
+        self, name: str, timeout: int, showtime: int, template: str, order: int = 0
     ) -> WidgetDTO: ...
 
     async def get_by_id(self, widget_id: int) -> WidgetDTO: ...
@@ -46,7 +46,13 @@ class WidgetRepoPort(Protocol):
     async def get_all(self) -> list[WidgetDTO]: ...
 
     async def update(
-        self, widget_id: int, name: str, timeout: int, showtime: int, template: str
+        self,
+        widget_id: int,
+        name: str,
+        timeout: int,
+        showtime: int,
+        template: str,
+        order: int = 0,
     ) -> WidgetDTO: ...
 
     async def delete(self, widget_id: int) -> None: ...
