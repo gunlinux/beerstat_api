@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin">
+  <h2>Edit Donation #{{ donate.id }}</h2>
+  <form method="post" action="/admin/donations/{{ donate.id }}/edit">
+    <label>Name<input name="name" value="{{ donate.name }}" required></label>
+    <label>Value<input name="value" type="number" step="0.01" min="0" value="{{ donate.value }}" required></label>
+    <label>Date<input name="date" type="datetime-local" value="{{ donate.date.strftime('%Y-%m-%dT%H:%M') }}" required></label>
+    <button type="submit">Save</button>
+    <a href="/admin/donations/">Cancel</a>
+  </form>
+</div>
+{% endblock %}

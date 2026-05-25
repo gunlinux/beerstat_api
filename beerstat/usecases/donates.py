@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from beerstat.domain.exceptions import DomainError
+from beerstat.domain.exceptions import DomainError, DonateNotFoundError
 from beerstat.domain.ports import DonateRepoPort
 from beerstat.infrastructure.exceptions import RepoError
 from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
@@ -39,3 +39,55 @@ class GetLastDonations:
             return await self.repo.get_last(limit)
         except RepoError:
             raise DomainError
+
+
+@dataclass
+class GetDonationsPage:
+    repo: DonateRepoPort
+
+    async def execute(self, page: int, page_size: int) -> tuple[list[DonateDTO], int]:
+        offset = (page - 1) * page_size
+        try:
+            donations = await self.repo.get_page(offset=offset, limit=page_size)
+            total = await self.repo.count()
+            return donations, total
+        except RepoError:
+            raise DomainError
+
+
+@dataclass
+class GetDonate:
+    repo: DonateRepoPort
+
+    async def execute(self, donate_id: int) -> DonateDTO:
+        try:
+            return await self.repo.get_by_id(donate_id=donate_id)
+        except RepoError:
+            raise DonateNotFoundError
+
+
+@dataclass
+class UpdateDonate:
+    repo: DonateRepoPort
+
+    async def execute(self, donate_id: int, donate: DonateDTO) -> DonateDTO:
+        try:
+            return await self.repo.update(
+                donate_id=donate_id,
+                name=donate.name,
+                value=donate.value,
+                date=donate.date,
+            )
+        except RepoError:
+            raise DonateNotFoundError
+
+
+@dataclass
+class DeleteDonate:
+    repo: DonateRepoPort
+
+    async def execute(self, donate_id: int) -> None:
+        try:
+            await self.repo.delete(donate_id=donate_id)
+        except RepoError:
+            raise DonateNotFoundError

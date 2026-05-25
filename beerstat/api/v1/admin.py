@@ -1,12 +1,22 @@
-from fastapi import APIRouter, Depends, Form, Request, Response
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, Form, Query, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from beerstat.api.deps import get_settings, get_widget_repo
+from beerstat.api.deps import get_donate_repo, get_settings, get_widget_repo
+from beerstat.domain.donate import DonateDTO
 from beerstat.domain.widget import WidgetDTO
+from beerstat.infrastructure.donates import DonateRepo
 from beerstat.infrastructure.widgets import WidgetRepo
-from beerstat.models import WidgetOut
+from beerstat.models import DonateOut, WidgetOut
 from beerstat.settings import Settings
+from beerstat.usecases.donates import (
+    DeleteDonate,
+    GetDonate,
+    GetDonationsPage,
+    UpdateDonate,
+)
 from beerstat.usecases.widgets import (
     CreateWidget,
     DeleteWidget,
@@ -14,6 +24,8 @@ from beerstat.usecases.widgets import (
     GetWidgets,
     UpdateWidget,
 )
+
+PAGE_SIZE = 20
 
 admin_router = APIRouter()
 templates = Jinja2Templates("templates")
@@ -28,6 +40,9 @@ async def admin_index(
         WidgetOut.from_dto(w) for w in await GetWidgets(repo=widget_repo).execute()
     ]
     return templates.TemplateResponse(request, "admin/index.html", {"widgets": widgets})
+
+
+# --- Widget routes ---
 
 
 @admin_router.get("/widget/new")
@@ -90,4 +105,65 @@ async def admin_widget_delete(
     widget_repo: WidgetRepo = Depends(get_widget_repo),
 ):
     await DeleteWidget(repo=widget_repo).execute(widget_id)
+    return Response(status_code=200)
+
+
+# --- Donation routes ---
+
+
+@admin_router.get("/donations/")
+async def admin_donations(
+    request: Request,
+    page: int = Query(default=1, ge=1),
+    donate_repo: DonateRepo = Depends(get_donate_repo),
+):
+    donations, total = await GetDonationsPage(repo=donate_repo).execute(
+        page=page, page_size=PAGE_SIZE
+    )
+    total_pages = max(1, (total + PAGE_SIZE - 1) // PAGE_SIZE)
+    return templates.TemplateResponse(
+        request,
+        "admin/donations.html",
+        {
+            "donations": [DonateOut.from_dto(d) for d in donations],
+            "page": page,
+            "total_pages": total_pages,
+            "total": total,
+        },
+    )
+
+
+@admin_router.get("/donations/{donate_id}/edit")
+async def admin_donation_edit(
+    request: Request,
+    donate_id: int,
+    donate_repo: DonateRepo = Depends(get_donate_repo),
+):
+    donate = DonateOut.from_dto(await GetDonate(repo=donate_repo).execute(donate_id))
+    return templates.TemplateResponse(
+        request, "admin/donation_edit.html", {"donate": donate}
+    )
+
+
+@admin_router.post("/donations/{donate_id}/edit")
+async def admin_donation_update(
+    donate_id: int,
+    name: str = Form(...),
+    value: float = Form(...),
+    date: str = Form(...),
+    donate_repo: DonateRepo = Depends(get_donate_repo),
+):
+    await UpdateDonate(repo=donate_repo).execute(
+        donate_id=donate_id,
+        donate=DonateDTO(name=name, value=value, date=datetime.fromisoformat(date)),
+    )
+    return RedirectResponse(url="/admin/donations/", status_code=303)
+
+
+@admin_router.delete("/donations/{donate_id}", status_code=200)
+async def admin_donation_delete(
+    donate_id: int,
+    donate_repo: DonateRepo = Depends(get_donate_repo),
+):
+    await DeleteDonate(repo=donate_repo).execute(donate_id)
     return Response(status_code=200)

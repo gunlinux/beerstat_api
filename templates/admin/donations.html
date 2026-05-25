@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin">
+  <h1>Donations <small>({{ total }} total)</small></h1>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Value</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in donations %}
+      <tr id="donation-{{ d.id }}">
+        <td>{{ d.id }}</td>
+        <td>{{ d.name }}</td>
+        <td>{{ "%.2f"|format(d.value) }}</td>
+        <td>{{ d.date.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+          <a href="/admin/donations/{{ d.id }}/edit">Edit</a>
+          <button hx-delete="/admin/donations/{{ d.id }}"
+                  hx-target="#donation-{{ d.id }}"
+                  hx-swap="delete"
+                  hx-confirm="Delete donation #{{ d.id }} from {{ d.name }}?">Delete</button>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No donations.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <nav class="pagination">
+    {% if page > 1 %}
+    <a href="?page={{ page - 1 }}">&laquo; Prev</a>
+    {% endif %}
+    <span>Page {{ page }} of {{ total_pages }}</span>
+    {% if page < total_pages %}
+    <a href="?page={{ page + 1 }}">Next &raquo;</a>
+    {% endif %}
+  </nav>
+</div>
+{% endblock %}
