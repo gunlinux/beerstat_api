@@ -70,6 +70,10 @@ class WidgetOut(BaseModel):
         return cls(**asdict(dto))
 
 
+class DonationsOut(BaseModel):
+    donations: list[DonateOut]
+
+
 class WidgetStat(BaseModel):
     sleep_time: int
     showtime: int

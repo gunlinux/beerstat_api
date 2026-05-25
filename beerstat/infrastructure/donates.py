@@ -29,3 +29,11 @@ class DonateRepo:
             if row := await cursor.fetchone():
                 return row[0]
         return None
+
+    async def get_last(self, limit: int) -> list[DonateDTO]:
+        async with await self.connection.execute(
+            "SELECT id, name, date, value FROM donations ORDER BY date DESC LIMIT ?",
+            (limit,),
+        ) as cursor:
+            rows = await cursor.fetchall()
+        return [DonateDTO(id=r[0], name=r[1], date=r[2], value=r[3]) for r in rows]

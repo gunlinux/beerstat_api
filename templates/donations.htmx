@@ -1,0 +1,10 @@
+<ul class="donations-list">
+  {% for d in donations %}
+  <li class="donation-item">
+    <span class="donation-name">{{ d.name }}</span>
+    <span class="donation-value">{{ d.value }} €</span>
+  </li>
+  {% else %}
+  <li class="donation-empty">No donations yet.</li>
+  {% endfor %}
+</ul>

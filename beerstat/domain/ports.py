@@ -12,6 +12,8 @@ class DonateRepoPort(Protocol):
 
     async def get_balance(self) -> float | None: ...
 
+    async def get_last(self, limit: int) -> list[DonateDTO]: ...
+
 
 class WidgetRepoPort(Protocol):
     async def add(

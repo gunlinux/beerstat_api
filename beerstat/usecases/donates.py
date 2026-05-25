@@ -28,3 +28,14 @@ class GetBalance:
     async def execute(self) -> DonateBalanceDTO:
         balance = await self.repo.get_balance()
         return DonateBalanceDTO(total=balance if balance is not None else 0.0)
+
+
+@dataclass
+class GetLastDonations:
+    repo: DonateRepoPort
+
+    async def execute(self, limit: int = 10) -> list[DonateDTO]:
+        try:
+            return await self.repo.get_last(limit)
+        except RepoError:
+            raise DomainError

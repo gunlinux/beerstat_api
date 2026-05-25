@@ -17,6 +17,11 @@ jinja = Jinja(Jinja2Templates("templates"))
 async def index() -> WidgetStat: ...
 
 
+@widgets_page.get("/donations")
+@jinja.page("donations_page.html")
+async def donations_page() -> None: ...
+
+
 @widgets_page.get("/{widget_id}")
 @jinja.hx("widget.htmx")
 async def widget_page(
