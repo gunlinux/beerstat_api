@@ -58,11 +58,13 @@ body {
     color: #b58900;
 }
 
+.title,
 .blue {
     color: #268bd2 !important;
     --color-primary: #268bd2;
 }
 
+.user,
 .magenta {
     color: #d33682;
     --color-primary: #d33682;

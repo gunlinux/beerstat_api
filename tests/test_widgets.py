@@ -58,7 +58,7 @@ class TestGetWidgets:
 
         result = await use_case.execute()
 
-        assert result == []
+        assert len(result) == 4  # 4 seeded default widgets
 
     async def test_get_all_returns_multiple_widgets(self, db_connection):
         repo = WidgetRepo(connection=db_connection)
@@ -68,7 +68,7 @@ class TestGetWidgets:
         use_case = GetWidgets(repo=repo)
         result = await use_case.execute()
 
-        assert len(result) == 2
+        assert len(result) == 6  # 4 seeded + 2 created
         names = [w.name for w in result]
         assert "w1" in names
         assert "w2" in names

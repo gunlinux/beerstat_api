@@ -1,10 +1,25 @@
-<ol class="donators-list">
-  {% for d in donators %}
-  <li class="donator-item">
-    <span class="donator-name">{{ d.name }}</span>
-    <span class="donator-total">{{ "%.2f"|format(d.total) }} €</span>
-  </li>
-  {% else %}
-  <li class="donator-empty">No donations yet.</li>
-  {% endfor %}
-</ol>
+<table class="simple bordered">
+  <thead>
+    <tr class=title>
+      <th>Donator</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in donators %}
+      <tr class="donation-item">
+        <td class="donation-name user">{{ d.name }}</td>
+        <td class="donator-total">{{ "%.2f"|format(d.total) }} ₽</td>
+      </tr>
+      {% else %}
+      <tr class="donation-empty"><td>No donations yet.</td></tr>
+      {% endfor %}
+
+      <!-- tr and td tags-->
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2"></td>
+    </tr>
+  </tfoot>
+</table>

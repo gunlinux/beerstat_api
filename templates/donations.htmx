@@ -1,6 +1,6 @@
 <table class="simple bordered">
   <thead>
-    <tr>
+    <tr class=title>
       <th>Donator</th>
       <th>Value</th>
     </tr>
@@ -8,7 +8,7 @@
   <tbody>
     {% for d in donations %}
       <tr class="donation-item">
-        <td class="donation-name">{{ d.name }}</td>
+        <td class="donation-name user">{{ d.name }}</td>
         <td class="donation-value">{{ d.value }} ₽</td>
       </tr>
       {% else %}

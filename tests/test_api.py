@@ -72,7 +72,7 @@ class TestWidgetEndpoints:
     async def test_get_all_widgets_empty(self, client):
         resp = await client.get("/widget/")
         assert resp.status_code == 200
-        assert resp.json() == []
+        assert len(resp.json()) == 4  # 4 seeded default widgets
 
     async def test_get_all_widgets_with_data(self, client):
         await client.post(
@@ -86,7 +86,7 @@ class TestWidgetEndpoints:
         )
         resp = await client.get("/widget/")
         assert resp.status_code == 200
-        assert len(resp.json()) == 1
+        assert len(resp.json()) == 5  # 4 seeded + 1 created
 
     async def test_create_widget_without_showtime_uses_settings_default(self, client):
         resp = await client.post(
