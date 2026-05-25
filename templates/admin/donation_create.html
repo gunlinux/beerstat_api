@@ -1,0 +1,44 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}New Donation — BeerStat Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8">
+    <div class="mb-3">
+      <a href="/admin/donations/" class="text-secondary text-decoration-none small">
+        <i class="bi bi-arrow-left me-1"></i>Back to Donations
+      </a>
+    </div>
+    <div class="card border-secondary">
+      <div class="card-header border-secondary">
+        <h5 class="card-title mb-0">New Donation</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" action="/admin/donations/new">
+          <div class="mb-3">
+            <label class="form-label text-secondary">Name</label>
+            <input class="form-control" name="name" value="" placeholder="Anonym">
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-secondary">Value</label>
+            <input class="form-control font-monospace" name="value" type="number"
+                   step="0.01" min="0.01" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label text-secondary">Date</label>
+            <input class="form-control" name="date" type="datetime-local"
+                   value="{{ now }}" required>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-plus-lg me-1"></i>Create
+            </button>
+            <a href="/admin/donations/" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
