@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from beerstat.api.deps import get_donate_repo
-from beerstat.repo.donates import DonateRepo
+from beerstat.infrastructure.donates import DonateRepo
 from beerstat.models import DonateCreateIn, DonateOut, DonateBalance
 from beerstat.usecases.donates import CreateDonate, GetBalance
 

@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from aiosqlite import Connection
+
 from beerstat.domain.donate import DonateDTO
-from beerstat.repo.exceptions import RepoError
+from beerstat.infrastructure.exceptions import RepoError
 
 
 class DonateRepo:

@@ -4,7 +4,7 @@ from fasthx.jinja import Jinja
 
 from beerstat.api.deps import get_widget_repo, get_settings
 from beerstat.models import WidgetCreateIn, WidgetOut
-from beerstat.repo.widgets import WidgetRepo
+from beerstat.infrastructure.widgets import WidgetRepo
 from beerstat.settings import Settings
 from beerstat.usecases.widgets import CreateWidget, GetWidget, GetWidgets
 

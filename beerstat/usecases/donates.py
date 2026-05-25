@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from beerstat.domain.exceptions import DomainError
 from beerstat.domain.ports import DonateRepoPort
-from beerstat.repo.exceptions import RepoError
+from beerstat.infrastructure.exceptions import RepoError
 from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
 
 

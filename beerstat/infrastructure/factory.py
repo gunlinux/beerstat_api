@@ -5,8 +5,8 @@ from typing import cast
 import aiosqlite
 from aiosqlitepool import SQLiteConnectionPool
 
-from beerstat.repo.donates import DonateRepo
-from beerstat.repo.widgets import WidgetRepo
+from beerstat.infrastructure.donates import DonateRepo
+from beerstat.infrastructure.widgets import WidgetRepo
 
 
 class RepoFactory:

@@ -4,7 +4,7 @@ from datetime import datetime
 import pytest
 
 from beerstat.domain.donate import DonateDTO, DonateBalanceDTO
-from beerstat.repo.donates import DonateRepo
+from beerstat.infrastructure.donates import DonateRepo
 from beerstat.usecases.donates import CreateDonate, GetBalance
 
 

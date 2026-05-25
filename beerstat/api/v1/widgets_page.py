@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fasthx.jinja import Jinja
 
 from beerstat.api.deps import get_widget_repo
-from beerstat.repo.widgets import WidgetRepo
+from beerstat.infrastructure.widgets import WidgetRepo
 from beerstat.usecases.widgets import GetWidget
 from beerstat.models import WidgetOut, WidgetStat
 

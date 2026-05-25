@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from beerstat.domain.ports import WidgetRepoPort
-from beerstat.repo.exceptions import RepoError
+from beerstat.infrastructure.exceptions import RepoError
 from beerstat.domain.widget import WidgetDTO
 from beerstat.domain.exceptions import WidgetNotFoundError, CreateError
 

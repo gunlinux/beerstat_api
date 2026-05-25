@@ -1,7 +1,7 @@
 from aiosqlite import Connection
-from beerstat.domain.widget import WidgetDTO
 
-from beerstat.repo.exceptions import RepoError
+from beerstat.domain.widget import WidgetDTO
+from beerstat.infrastructure.exceptions import RepoError
 
 
 class WidgetRepo:

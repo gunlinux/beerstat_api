@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock
 
 from beerstat.domain.exceptions import WidgetNotFoundError, CreateError
 from beerstat.domain.widget import WidgetDTO
-from beerstat.repo.exceptions import RepoError
-from beerstat.repo.widgets import WidgetRepo
+from beerstat.infrastructure.exceptions import RepoError
+from beerstat.infrastructure.widgets import WidgetRepo
 from beerstat.usecases.widgets import (
     CreateWidget,
     GetWidget,
