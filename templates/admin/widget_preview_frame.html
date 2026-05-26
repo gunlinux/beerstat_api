@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/static/css/reset.css" rel="stylesheet">
+  <link href="/static/css/terminalize.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+    integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+    crossorigin="anonymous"></script>
+</head>
+<body>
+  <article class="widget widget--visible" id="widget-slot"></article>
+  <script>
+    (async function () {
+      const res = await fetch("/widget/{{ widget_id }}", {
+        headers: { "HX-Request": "true" }
+      });
+      const html = await res.text();
+      const slot = document.getElementById("widget-slot");
+      slot.innerHTML = html;
+      htmx.process(slot);
+    })();
+  </script>
+</body>
+</html>
