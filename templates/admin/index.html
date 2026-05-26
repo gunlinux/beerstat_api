@@ -19,6 +19,7 @@
           <th>Name</th>
           <th>Timeout (s)</th>
           <th>Showtime (s)</th>
+          <th>Order</th>
           <th class="text-end">Actions</th>
         </tr>
       </thead>
@@ -29,6 +30,7 @@
           <td class="fw-medium">{{ widget.name }}</td>
           <td>{{ widget.timeout }}</td>
           <td>{{ widget.showtime }}</td>
+          <td>{{ widget.order }}</td>
           <td class="text-end">
             <a href="/admin/widget/{{ widget.id }}/edit"
                class="btn btn-outline-primary btn-sm me-1">
@@ -45,7 +47,7 @@
         </tr>
         {% else %}
         <tr>
-          <td colspan="5" class="text-center text-secondary py-5">No widgets yet.</td>
+          <td colspan="6" class="text-center text-secondary py-5">No widgets yet.</td>
         </tr>
         {% endfor %}
       </tbody>
