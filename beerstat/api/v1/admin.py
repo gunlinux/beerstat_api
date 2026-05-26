@@ -77,6 +77,28 @@ async def admin_widget_create(
     return RedirectResponse(url="/admin/", status_code=303)
 
 
+@admin_router.get("/widget/{widget_id}/preview")
+async def admin_widget_preview(
+    request: Request,
+    widget_id: int,
+    widget_repo: WidgetRepo = Depends(get_widget_repo),
+):
+    widget = WidgetOut.from_dto(await GetWidget(repo=widget_repo).execute(widget_id))
+    return templates.TemplateResponse(
+        request, "admin/widget_preview.html", {"widget": widget}
+    )
+
+
+@admin_router.get("/widget/{widget_id}/preview/frame")
+async def admin_widget_preview_frame(
+    request: Request,
+    widget_id: int,
+):
+    return templates.TemplateResponse(
+        request, "admin/widget_preview_frame.html", {"widget_id": widget_id}
+    )
+
+
 @admin_router.get("/widget/{widget_id}/edit")
 async def admin_widget_edit(
     request: Request,

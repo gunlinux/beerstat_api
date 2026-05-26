@@ -32,6 +32,10 @@
           <td>{{ widget.showtime }}</td>
           <td>{{ widget.order }}</td>
           <td class="text-end">
+            <a href="/admin/widget/{{ widget.id }}/preview"
+               class="btn btn-outline-secondary btn-sm me-1">
+              <i class="bi bi-eye"></i> Preview
+            </a>
             <a href="/admin/widget/{{ widget.id }}/edit"
                class="btn btn-outline-primary btn-sm me-1">
               <i class="bi bi-pencil"></i> Edit
